@@ -167,35 +167,10 @@ def Look_up():
 
 def restart():
     profile = get_active_profile()
-    if profile.restart_mode != "hollow_knight":
-        Nothing()
-        time.sleep(0.5)
-        return
     station_size = profile.station_size
-    while True:
-        station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(1000,500))
-        if station[187][300][0] != 0: 
-            time.sleep(1)
-        else:
-            break
-    time.sleep(1)
-    Look_up()
-    time.sleep(1.5)
-    Look_up()
-    time.sleep(1)
-    while True:
-        station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(1000,500))
-        if station[187][612][0] > 200: 
-            # PressKey(DOWN_ARROW)
-            # time.sleep(0.1)
-            # ReleaseKey(DOWN_ARROW)
-            PressKey(C)
-            time.sleep(0.1)
-            ReleaseKey(C)
-            break
-        else:
-            Look_up()
-            time.sleep(0.2)
+    _ = station_size
+    Nothing()
+    time.sleep(0.5)
 
 
 ACTION_FUNC_MAP = {

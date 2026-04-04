@@ -45,16 +45,6 @@ class Agent:
     def better_move(self, enemy_x, player_x, enemy_skill1, profile):
         dis = abs(player_x - enemy_x)
         dire = player_x - enemy_x
-        if profile.name == "hollow_knight":
-            if enemy_skill1:
-                if dis < 6:
-                    return 1 if dire > 0 else 0
-                return 2 if dire > 0 else 3
-            if dis < 2.5:
-                return 1 if dire > 0 else 0
-            if dis < 5:
-                return 2 if dire > 0 else 3
-            return 0 if dire > 0 else 1
 
         if dis > 6:
             return 0 if dire > 0 else 1
@@ -64,32 +54,6 @@ class Agent:
 
     def better_action(self, soul, enemy_x, enemy_y, player_x, enemy_skill1, profile):
         dis = abs(player_x - enemy_x)
-        if profile.name == "hollow_knight":
-            if enemy_skill1:
-                if dis < 3:
-                    return 6
-                else:
-                    return 1
-            
-            if enemy_y > 34 and dis < 5 and soul >= 33:
-                return 4
-            
-            if dis < 1.5:
-                return 6
-            elif dis < 5:
-                if enemy_y > 32:
-                    return 6
-                else:
-                    act = np.random.randint(self.act_dim)
-                    if soul < 33:
-                        while act == 4 or act == 5:
-                            act = np.random.randint(self.act_dim)
-                    return act
-            elif dis < 12:
-                act = np.random.randint(2)
-                return 2 + act
-            else:
-                return 6
 
         if dis < 2.5:
             return 0

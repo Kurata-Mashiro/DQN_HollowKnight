@@ -46,6 +46,7 @@ action_name = list(PROFILE.action_names)
 move_name = list(PROFILE.move_names)
 
 DELAY_REWARD = 1
+MAX_EPISODE_STEP = 600
 
 
 
@@ -82,11 +83,7 @@ def run_episode(hp, algorithm,agent,act_rmp_correct, move_rmp_correct,PASS_COUNT
         state = hp.get_state()
         boss_hp_value = state["enemy_hp"]
         self_hp = state["self_hp"]
-        # For non-Hollow Knight profiles we don't have a strict pre-fight HP signature.
-        if PROFILE.name != "hollow_knight":
-            break
-        if boss_hp_value > 800 and  boss_hp_value <= 900 and self_hp >= 1 and self_hp <= 9:
-            break
+        break
         if time.time() - start_wait > PROFILE.episode_start_timeout_sec:
             break
         time.sleep(0.1)
@@ -184,6 +181,8 @@ def run_episode(hp, algorithm,agent,act_rmp_correct, move_rmp_correct,PASS_COUNT
         #     algorithm.act_learn(batch_station,batch_actions,batch_reward,batch_next_station,batch_done)
 
         total_reward += act_reward
+        if step >= MAX_EPISODE_STEP:
+            done = 1
         paused = Tool.Helper.pause_game(paused)
 
         if done == 1:
@@ -249,8 +248,7 @@ if __name__ == '__main__':
     # user = User()
 
     # paused at the begining
-    paused = True
-    paused = Tool.Helper.pause_game(paused)
+    paused = False
 
     max_episode = 30000
     # 开始训练
