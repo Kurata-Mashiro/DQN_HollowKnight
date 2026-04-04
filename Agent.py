@@ -58,6 +58,7 @@ class Agent:
         if dis < 2.5:
             return 0
         if dis < 6:
+            # Prefer close-range attack/jump subset during mid-range spacing.
             act = np.random.randint(min(3, self.act_dim))
             return act
         if self.act_dim > 4:

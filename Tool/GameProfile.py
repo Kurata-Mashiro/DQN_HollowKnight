@@ -15,6 +15,7 @@ class GameProfile:
     state_fallback: Dict[str, float]
     max_self_hp: float = 100.0
     episode_start_timeout_sec: float = 5.0
+    max_episode_step: int = 600
     skill_block_penalty: float = -30.0
     action_reward_close_distance: float = 5.0
     action_reward_far_distance: float = 8.0
@@ -52,7 +53,8 @@ ICEY_PROFILE = GameProfile(
         "enemy_y": 0.0,
         "souls": 99,
     },
-    episode_start_timeout_sec=1.0,
+    episode_start_timeout_sec=3.0,
+    max_episode_step=600,
     skill_block_penalty=-30.0,
     action_reward_close_distance=5.0,
     action_reward_far_distance=8.0,

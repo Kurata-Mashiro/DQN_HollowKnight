@@ -47,7 +47,7 @@ action_name = list(PROFILE.action_names)
 move_name = list(PROFILE.move_names)
 
 DELAY_REWARD = 1
-MAX_EPISODE_STEP = 600
+MAX_EPISODE_STEP = PROFILE.max_episode_step
 
 
 
