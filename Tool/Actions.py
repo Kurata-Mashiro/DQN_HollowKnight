@@ -6,6 +6,7 @@ from Tool.WindowsAPI import grab_screen
 import time
 import cv2
 import threading
+from Tool.GameProfile import get_active_profile
 
 # Hash code for key we may use: https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes?redirectedfrom=MSDN
 UP_ARROW = 0x26
@@ -165,7 +166,12 @@ def Look_up():
     ReleaseKey(UP_ARROW)
 
 def restart():
-    station_size = (230, 230, 1670, 930)
+    profile = get_active_profile()
+    if profile.restart_mode != "hollow_knight":
+        Nothing()
+        time.sleep(0.5)
+        return
+    station_size = profile.station_size
     while True:
         station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(1000,500))
         if station[187][300][0] != 0: 
@@ -192,10 +198,34 @@ def restart():
             time.sleep(0.2)
 
 
+ACTION_FUNC_MAP = {
+    "Attack": Attack,
+    "Attack_Up": Attack_Up,
+    "Short_Jump": Short_Jump,
+    "Mid_Jump": Mid_Jump,
+    "Skill_Up": Skill_Up,
+    "Skill_Down": Skill_Down,
+    "Rush": Rush,
+    "Cure": Cure,
+    "Light_Attack": Attack,
+    "Heavy_Attack": Attack_Up,
+    "Dash": Rush,
+}
+
+
+def _resolve_actions():
+    profile = get_active_profile()
+    resolved = []
+    for action_name in profile.action_names:
+        action_func = ACTION_FUNC_MAP.get(action_name)
+        if action_func is None:
+            action_func = Nothing
+        resolved.append(action_func)
+    return resolved
+
+
 # List for action functions
-Actions = [Attack, Attack_Up,
-           Short_Jump, Mid_Jump, Skill_Up, 
-           Skill_Down, Rush, Cure]
+Actions = _resolve_actions()
 Directions = [Move_Left, Move_Right, Turn_Left, Turn_Right]
 # Run the action
 def take_action(action):

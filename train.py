@@ -22,15 +22,17 @@ from Tool.WindowsAPI import grab_screen
 from Tool.GetHP import Hp_getter
 from Tool.UserInput import User
 from Tool.FrameBuffer import FrameBuffer
+from Tool.GameProfile import get_active_profile
 
+PROFILE = get_active_profile()
 window_size = (0,0,1920,1017)
-station_size = (230, 230, 1670, 930)
+station_size = PROFILE.station_size
 
 HP_WIDTH = 768
 HP_HEIGHT = 407
-WIDTH = 400
-HEIGHT = 200
-ACTION_DIM = 7
+WIDTH = PROFILE.frame_size[0]
+HEIGHT = PROFILE.frame_size[1]
+ACTION_DIM = PROFILE.action_dim
 FRAMEBUFFERSIZE = 4
 INPUT_SHAPE = (FRAMEBUFFERSIZE, HEIGHT, WIDTH, 3)
 
@@ -40,11 +42,8 @@ BATCH_SIZE = 10  # 每次给agent learn的数据数量，从replay memory随机�
 LEARNING_RATE = 0.00001  # 学习率
 GAMMA = 0
 
-action_name = ["Attack", "Attack_Up",
-           "Short_Jump", "Mid_Jump", "Skill_Up", 
-           "Skill_Down", "Rush", "Cure"]
-
-move_name = ["Move_Left", "Move_Right", "Turn_Left", "Turn_Right"]
+action_name = list(PROFILE.action_names)
+move_name = list(PROFILE.move_names)
 
 DELAY_REWARD = 1
 
@@ -78,17 +77,23 @@ def run_episode(hp, algorithm,agent,act_rmp_correct, move_rmp_correct,PASS_COUNT
     DelayActions = collections.deque(maxlen=DELAY_REWARD)
     DelayDirection = collections.deque(maxlen=DELAY_REWARD)
     
+    start_wait = time.time()
     while True:
-        boss_hp_value = hp.get_boss_hp()
-        self_hp = hp.get_self_hp()
+        state = hp.get_state()
+        boss_hp_value = state["enemy_hp"]
+        self_hp = state["self_hp"]
+        if PROFILE.name != "hollow_knight":
+            break
         if boss_hp_value > 800 and  boss_hp_value <= 900 and self_hp >= 1 and self_hp <= 9:
+            break
+        if time.time() - start_wait > 5:
             break
         
 
-    thread1 = FrameBuffer(1, "FrameBuffer", WIDTH, HEIGHT, maxlen=FRAMEBUFFERSIZE)
+    thread1 = FrameBuffer(1, "FrameBuffer", WIDTH, HEIGHT, maxlen=FRAMEBUFFERSIZE, station_size=station_size, window_title=PROFILE.window_title)
     thread1.start()
 
-    last_hornet_y = 0
+    last_enemy_y = 0
     while True:
         step += 1
         # last_time = time.time()
@@ -102,18 +107,19 @@ def run_episode(hp, algorithm,agent,act_rmp_correct, move_rmp_correct,PASS_COUNT
             time.sleep(0.1)
         
         stations = thread1.get_buffer()
-        boss_hp_value = hp.get_boss_hp()
-        self_hp = hp.get_self_hp()
-        player_x, player_y = hp.get_play_location()
-        hornet_x, hornet_y = hp.get_hornet_location()
-        soul = hp.get_souls()
+        state = hp.get_state()
+        boss_hp_value = state["enemy_hp"]
+        self_hp = state["self_hp"]
+        player_x, player_y = state["player_x"], state["player_y"]
+        enemy_x, enemy_y = state["enemy_x"], state["enemy_y"]
+        soul = state["souls"]
 
-        hornet_skill1 = False
-        if last_hornet_y > 32 and last_hornet_y < 32.5 and hornet_y > 32 and hornet_y < 32.5:
-            hornet_skill1 = True
-        last_hornet_y = hornet_y
+        enemy_skill1 = False
+        if last_enemy_y > 32 and last_enemy_y < 32.5 and enemy_y > 32 and enemy_y < 32.5:
+            enemy_skill1 = True
+        last_enemy_y = enemy_y
 
-        move, action = agent.sample(stations, soul, hornet_x, hornet_y, player_x, hornet_skill1)
+        move, action = agent.sample(stations, soul, enemy_x, enemy_y, player_x, enemy_skill1)
 
         
         # action = 0
@@ -124,15 +130,26 @@ def run_episode(hp, algorithm,agent,act_rmp_correct, move_rmp_correct,PASS_COUNT
         # start_time = time.time()
         
         next_station = thread1.get_buffer()
-        next_boss_hp_value = hp.get_boss_hp()
-        next_self_hp = hp.get_self_hp()
-        next_player_x, next_player_y = hp.get_play_location()
-        next_hornet_x, next_hornet_y = hp.get_hornet_location()
+        next_state = hp.get_state()
+        next_boss_hp_value = next_state["enemy_hp"]
+        next_self_hp = next_state["self_hp"]
+        next_player_x, next_player_y = next_state["player_x"], next_state["player_y"]
+        next_enemy_x, next_enemy_y = next_state["enemy_x"], next_state["enemy_y"]
 
         # get reward
-        move_reward = Tool.Helper.move_judge(self_hp, next_self_hp, player_x, next_player_x, hornet_x, next_hornet_x, move, hornet_skill1)
+        move_reward = Tool.Helper.move_judge(self_hp, next_self_hp, player_x, next_player_x, enemy_x, next_enemy_x, move, enemy_skill1)
         # print(move_reward)
-        act_reward, done = Tool.Helper.action_judge(boss_hp_value, next_boss_hp_value,self_hp, next_self_hp, next_player_x, next_hornet_x,next_hornet_x, action, hornet_skill1)
+        act_reward, done = Tool.Helper.action_judge(
+            boss_hp_value,
+            next_boss_hp_value,
+            self_hp,
+            next_self_hp,
+            next_player_x,
+            next_enemy_x,
+            next_enemy_y,
+            action,
+            enemy_skill1,
+        )
             # print(reward)
         # print( action_name[action], ", ", move_name[d], ", ", reward)
         
@@ -252,4 +269,3 @@ if __name__ == '__main__':
             act_rmp_correct.save(act_rmp_correct.file_name)
         total_remind_hp += remind_hp
         print("Episode: ", episode, ", pass_count: " , PASS_COUNT, ", hp:", total_remind_hp / episode)
-

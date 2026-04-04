@@ -1,4 +1,5 @@
 from Tool.WindowsAPI import key_check
+from Tool.GameProfile import get_active_profile
 import time
 
 
@@ -62,6 +63,18 @@ def distance_reward(move, next_player_x, next_hornet_x):
             return -2
 
 def move_judge(self_blood, next_self_blood, player_x, next_player_x, hornet_x, next_hornet_x, move, hornet_skill1):
+    profile = get_active_profile()
+    if profile.name != "hollow_knight":
+        hp_reward = count_self_reward(next_self_blood, self_blood)
+        distance_now = abs(player_x - hornet_x)
+        distance_next = abs(next_player_x - next_hornet_x)
+        distance_delta = distance_now - distance_next
+        reward = hp_reward + distance_delta * 2
+        if move < 2 and distance_next > 8:
+            reward += 1
+        if move >= 2 and distance_next < 2:
+            reward -= 1
+        return reward
     # reward = count_self_reward(next_self_blood, self_blood)
     # if reward < 0:
     #     return reward
@@ -144,6 +157,24 @@ def act_distance_reward(action, next_player_x, next_hornet_x, next_hornet_y):
 
 # JUDGEMENT FUNCTION, write yourself
 def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, next_player_x, next_hornet_x,next_hornet_y, action, hornet_skill1):
+    profile = get_active_profile()
+    if profile.name != "hollow_knight":
+        self_blood_reward = count_self_reward(next_self_blood, self_blood)
+        boss_blood_reward = count_boss_reward(next_boss_blood, boss_blood)
+        distance_reward = 0
+        if abs(next_player_x - next_hornet_x) < 5 and action in (0, 1):
+            distance_reward += 1.5
+        if abs(next_player_x - next_hornet_x) > 8 and action in (0, 1):
+            distance_reward -= 1.5
+
+        time_penalty = -0.2
+        reward = self_blood_reward + boss_blood_reward + distance_reward + time_penalty
+
+        if next_self_blood <= 0 and self_blood != 9:
+            return reward - 40, 1
+        if next_boss_blood <= 0:
+            return reward + 60, 2
+        return reward, 0
     # Player dead
     if next_self_blood <= 0 and self_blood != 9:    
         skill_reward = act_skill_reward(hornet_skill1, action, next_hornet_x, next_hornet_y, next_player_x)
