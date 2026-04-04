@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-from tensorflow.keras.models import load_model
-import tensorflow as tf
 import os
 import cv2
 import time
@@ -33,6 +31,7 @@ HP_HEIGHT = 407
 WIDTH = PROFILE.frame_size[0]
 HEIGHT = PROFILE.frame_size[1]
 ACTION_DIM = PROFILE.action_dim
+MOVE_DIM = PROFILE.move_dim
 FRAMEBUFFERSIZE = 4
 INPUT_SHAPE = (FRAMEBUFFERSIZE, HEIGHT, WIDTH, 3)
 
@@ -220,11 +219,6 @@ def run_episode(hp, algorithm,agent,act_rmp_correct,act_rmp_wrong, move_rmp_corr
 
 if __name__ == '__main__':
 
-    # In case of out of memory
-    config = tf.compat.v1.ConfigProto(allow_soft_placement=True)
-    config.gpu_options.allow_growth = True      #程序按需申请内存
-    sess = tf.compat.v1.Session(config = config)
-
     PASS_COUNT = 0                                       # pass count
     total_remind_hp = 0
 
@@ -234,7 +228,7 @@ if __name__ == '__main__':
     move_rmp_wrong = ReplayMemory(MEMORY_SIZE,file_name='./move_wrong_memory')         # experience pool
     
     # new model, if exit save file, load it
-    model = Model(INPUT_SHAPE, ACTION_DIM)  
+    model = Model(INPUT_SHAPE, ACTION_DIM, MOVE_DIM)
 
     # Hp counter
     hp = Hp_getter()

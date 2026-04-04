@@ -68,9 +68,9 @@ def move_judge(self_blood, next_self_blood, player_x, next_player_x, enemy_x, ne
     final_distance = abs(next_player_x - next_enemy_x)
     distance_delta = initial_distance - final_distance
     reward = hp_reward + distance_delta * 2
-    if move < 2 and final_distance > 8:
+    if move in (0, 1) and final_distance > 8:
         reward += 1
-    if move >= 2 and final_distance < 2:
+    if move in (0, 1) and final_distance < 2:
         reward -= 1
     return reward
 

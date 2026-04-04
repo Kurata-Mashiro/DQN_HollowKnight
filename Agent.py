@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-import tensorflow as tf
 from Tool.GameProfile import get_active_profile
 
 class Agent:
@@ -17,8 +16,8 @@ class Agent:
         pred_move, pred_act = self.algorithm.model.predict(station)
         # print(pred_move)
         # print(self.e_greed)
-        pred_move = pred_move.numpy()
-        pred_act = pred_act.numpy()
+        pred_move = pred_move.detach().cpu().numpy()
+        pred_act = pred_act.detach().cpu().numpy()
         sample = np.random.rand()  
         if sample < self.e_greed:
             move = self.better_move(enemy_x, player_x, enemy_skill1, profile)
@@ -50,7 +49,7 @@ class Agent:
             return 0 if dire > 0 else 1
         if dis < 2.5:
             return 1 if dire > 0 else 0
-        return 2 if dire > 0 else 3
+        return np.random.randint(profile.move_dim)
 
     def better_action(self, soul, enemy_x, enemy_y, player_x, enemy_skill1, profile):
         dis = abs(player_x - enemy_x)

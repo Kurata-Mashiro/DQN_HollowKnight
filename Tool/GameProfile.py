@@ -27,22 +27,23 @@ class GameProfile:
     @property
     def action_dim(self) -> int:
         return len(self.action_names)
+
+    @property
+    def move_dim(self) -> int:
+        return len(self.move_names)
 ICEY_PROFILE = GameProfile(
     name="icey",
     window_title=os.getenv("RL_GAME_WINDOW_TITLE", "ICEY"),
     station_size=(200, 160, 1720, 940),
     frame_size=(400, 200),
     action_names=(
+        "Jump",
+        "Dash",
         "Light_Attack",
         "Heavy_Attack",
-        "Short_Jump",
-        "Mid_Jump",
-        "Dash",
-        "Skill_Up",
-        "Skill_Down",
     ),
-    move_names=("Move_Left", "Move_Right", "Turn_Left", "Turn_Right"),
-    skill_action_indices=(5, 6),
+    move_names=("Move_Left", "Move_Right"),
+    skill_action_indices=(),
     state_fallback={
         # In the current ICEY runtime these fallback values are the active telemetry source.
         "self_hp": 100,

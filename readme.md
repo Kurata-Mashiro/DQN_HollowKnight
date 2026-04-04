@@ -5,6 +5,7 @@
 - Windows 10
 - Python 3.8+
 - Dependencies in `requirements.txt`
+- PyTorch runtime (`torch`)
 - ICEY game window must be visible in foreground
 
 ## Start Training Directly
@@ -15,6 +16,17 @@
    - `python train.py`
 
 Training now starts directly (no initial manual pause toggle required).
+
+## ICEY Action Mapping (current)
+
+- Move left: `A`
+- Move right: `D`
+- Jump: `Space`
+- Dash: `O`
+- Light attack: `J`
+- Heavy attack: `I`
+
+Other actions are removed from the runtime action space.
 
 ## Current Runtime Notes
 
