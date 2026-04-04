@@ -156,15 +156,15 @@ def act_distance_reward(action, next_player_x, next_hornet_x, next_hornet_y):
     return distance_reward
 
 # JUDGEMENT FUNCTION, write yourself
-def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, next_player_x, next_hornet_x,next_hornet_y, action, hornet_skill1):
+def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, next_player_x, next_enemy_x,next_enemy_y, action, hornet_skill1):
     profile = get_active_profile()
     if profile.name != "hollow_knight":
         self_blood_reward = count_self_reward(next_self_blood, self_blood)
         boss_blood_reward = count_boss_reward(next_boss_blood, boss_blood)
         distance_reward = 0
-        if abs(next_player_x - next_hornet_x) < 5 and action in (0, 1):
+        if abs(next_player_x - next_enemy_x) < 5 and action in (0, 1):
             distance_reward += 1.5
-        if abs(next_player_x - next_hornet_x) > 8 and action in (0, 1):
+        if abs(next_player_x - next_enemy_x) > 8 and action in (0, 1):
             distance_reward -= 1.5
 
         time_penalty = -0.2
@@ -177,8 +177,8 @@ def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, next_
         return reward, 0
     # Player dead
     if next_self_blood <= 0 and self_blood != 9:    
-        skill_reward = act_skill_reward(hornet_skill1, action, next_hornet_x, next_hornet_y, next_player_x)
-        distance_reward = act_distance_reward(action, next_player_x, next_hornet_x, next_hornet_y)
+        skill_reward = act_skill_reward(hornet_skill1, action, next_enemy_x, next_enemy_y, next_player_x)
+        distance_reward = act_distance_reward(action, next_player_x, next_enemy_x, next_enemy_y)
         self_blood_reward = count_self_reward(next_self_blood, self_blood)
         boss_blood_reward = count_boss_reward(next_boss_blood, boss_blood)
         reward = self_blood_reward + boss_blood_reward + distance_reward + skill_reward
@@ -191,8 +191,8 @@ def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, next_
     #boss dead
 
     elif next_boss_blood <= 0 or next_boss_blood > 900:   
-        skill_reward = act_skill_reward(hornet_skill1, action, next_hornet_x, next_hornet_y, next_player_x)
-        distance_reward = act_distance_reward(action, next_player_x, next_hornet_x, next_hornet_y)
+        skill_reward = act_skill_reward(hornet_skill1, action, next_enemy_x, next_enemy_y, next_player_x)
+        distance_reward = act_distance_reward(action, next_player_x, next_enemy_x, next_enemy_y)
         self_blood_reward = count_self_reward(next_self_blood, self_blood)
         boss_blood_reward = count_boss_reward(next_boss_blood, boss_blood)
         reward = self_blood_reward + boss_blood_reward + distance_reward + skill_reward
@@ -204,8 +204,8 @@ def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, next_
         return reward, done
     # playing
     else:
-        skill_reward = act_skill_reward(hornet_skill1, action, next_hornet_x, next_hornet_y, next_player_x)
-        distance_reward = act_distance_reward(action, next_player_x, next_hornet_x, next_hornet_y)
+        skill_reward = act_skill_reward(hornet_skill1, action, next_enemy_x, next_enemy_y, next_player_x)
+        distance_reward = act_distance_reward(action, next_player_x, next_enemy_x, next_enemy_y)
         self_blood_reward = count_self_reward(next_self_blood, self_blood)
         boss_blood_reward = count_boss_reward(next_boss_blood, boss_blood)
 

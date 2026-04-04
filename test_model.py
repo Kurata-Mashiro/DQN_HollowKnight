@@ -122,6 +122,9 @@ def run_episode(hp, algorithm,agent,act_rmp_correct,act_rmp_wrong, move_rmp_corr
         enemy_x, enemy_y = state["enemy_x"], state["enemy_y"]
         soul = state["souls"]
 
+        enemy_skill1 = False
+        if last_enemy_y > 32 and last_enemy_y < 32.5 and enemy_y > 32 and enemy_y < 32.5:
+            enemy_skill1 = True
         move, action = agent.sample(stations, soul, enemy_x, enemy_y, player_x, enemy_skill1)
 
         take_direction(move)
@@ -134,9 +137,6 @@ def run_episode(hp, algorithm,agent,act_rmp_correct,act_rmp_wrong, move_rmp_corr
         next_self_hp = next_state["self_hp"]
         next_player_x, next_player_y = next_state["player_x"], next_state["player_y"]
         next_enemy_x, next_enemy_y = next_state["enemy_x"], next_state["enemy_y"]
-        enemy_skill1 = False
-        if last_enemy_y > 32 and last_enemy_y < 32.5 and enemy_y > 32 and enemy_y < 32.5:
-            enemy_skill1 = True
         last_enemy_y = enemy_y
         # get reward
         move_reward = Tool.Helper.move_judge(self_hp, next_self_hp, player_x, next_player_x, enemy_x, next_enemy_x, move, enemy_skill1)
