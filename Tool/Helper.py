@@ -62,7 +62,7 @@ def distance_reward(move, next_player_x, next_hornet_x):
         else:
             return -2
 
-def move_judge(self_blood, next_self_blood, player_x, next_player_x, enemy_x, next_enemy_x, move, hornet_skill1):
+def move_judge(self_blood, next_self_blood, player_x, next_player_x, enemy_x, next_enemy_x, move, enemy_skill1):
     profile = get_active_profile()
     hp_reward = count_self_reward(next_self_blood, self_blood)
     distance_now = abs(player_x - enemy_x)

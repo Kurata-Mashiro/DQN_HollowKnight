@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass
-from typing import Tuple
+from typing import Dict, Tuple
 
 
 @dataclass(frozen=True)

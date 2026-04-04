@@ -83,7 +83,8 @@ def run_episode(hp, algorithm,agent,act_rmp_correct, move_rmp_correct,PASS_COUNT
         state = hp.get_state()
         boss_hp_value = state["enemy_hp"]
         self_hp = state["self_hp"]
-        break
+        if boss_hp_value >= 0 and self_hp >= 0:
+            break
         if time.time() - start_wait > PROFILE.episode_start_timeout_sec:
             break
         time.sleep(0.1)
