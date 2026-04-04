@@ -53,14 +53,17 @@ class Agent:
 
     def better_action(self, soul, enemy_x, enemy_y, player_x, enemy_skill1, profile):
         dis = abs(player_x - enemy_x)
-        mid_range_action_subset_size = 3
+        mid_range_action_indices = [
+            idx for idx in profile.mid_range_action_indices if 0 <= idx < self.act_dim
+        ]
 
         if dis < 2.5:
             return 0
         if dis < 6:
-            # Prefer close-range attack/jump subset during mid-range spacing.
-            act = np.random.randint(min(mid_range_action_subset_size, self.act_dim))
-            return act
+            # Prefer profile-defined mid-range subset during medium spacing.
+            if mid_range_action_indices:
+                return int(np.random.choice(mid_range_action_indices))
+            return int(np.random.randint(self.act_dim))
         if self.act_dim > 4:
             return 4
         return max(0, self.act_dim - 1)

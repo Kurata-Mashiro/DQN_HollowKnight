@@ -5,6 +5,7 @@ class Hp_getter():
     def __init__(self):
         profile = get_active_profile()
         self.profile = profile
+        self.has_realtime_telemetry = False
         self._fallback_state = dict(profile.state_fallback)
     
     def get_souls(self):

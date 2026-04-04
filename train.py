@@ -45,7 +45,7 @@ action_name = list(PROFILE.action_names)
 move_name = list(PROFILE.move_names)
 
 DELAY_REWARD = 1
-# Safety cap to force episode rollover if no terminal signal is observed from state.
+# Safety limit to force episode rollover if no terminal signal is observed from state.
 MAX_EPISODE_STEP = PROFILE.max_episode_step
 
 

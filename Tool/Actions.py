@@ -77,7 +77,7 @@ def _resolve_actions():
     for action_name in profile.action_names:
         action_func = ACTION_FUNC_MAP.get(action_name)
         if action_func is None:
-            action_func = Nothing
+            raise ValueError(f"Unsupported action configured in profile: {action_name}")
         resolved.append(action_func)
     return resolved
 
