@@ -102,7 +102,6 @@ def run_episode(hp, algorithm,agent,act_rmp_correct,act_rmp_wrong, move_rmp_corr
     thread1 = FrameBuffer(1, "FrameBuffer", WIDTH, HEIGHT, maxlen=FRAMEBUFFERSIZE, station_size=station_size, window_title=PROFILE.window_title)
     thread1.start()
 
-    last_enemy_y = 0
     while True:
         step += 1
         # last_time = time.time()
@@ -123,7 +122,6 @@ def run_episode(hp, algorithm,agent,act_rmp_correct,act_rmp_wrong, move_rmp_corr
         soul = state["souls"]
 
         enemy_skill1 = False
-        last_enemy_y = enemy_y
         move, action = agent.sample(stations, soul, enemy_x, enemy_y, player_x, enemy_skill1)
 
         take_direction(move)

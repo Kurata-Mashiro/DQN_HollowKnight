@@ -166,7 +166,6 @@ def Look_up():
     ReleaseKey(UP_ARROW)
 
 def restart():
-    _ = get_active_profile()
     Nothing()
     time.sleep(0.5)
 

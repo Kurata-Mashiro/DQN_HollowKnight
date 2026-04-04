@@ -63,7 +63,6 @@ def distance_reward(move, next_player_x, next_hornet_x):
             return -2
 
 def move_judge(self_blood, next_self_blood, player_x, next_player_x, enemy_x, next_enemy_x, move, enemy_skill1):
-    profile = get_active_profile()
     hp_reward = count_self_reward(next_self_blood, self_blood)
     distance_now = abs(player_x - enemy_x)
     distance_next = abs(next_player_x - next_enemy_x)
@@ -111,7 +110,7 @@ def act_distance_reward(action, next_player_x, next_hornet_x, next_hornet_y):
     return distance_reward
 
 # JUDGEMENT FUNCTION, write yourself
-def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, next_player_x, next_enemy_x,next_enemy_y, action, hornet_skill1):
+def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, next_player_x, next_enemy_x,next_enemy_y, action, enemy_skill1):
     profile = get_active_profile()
     self_blood_reward = count_self_reward(next_self_blood, self_blood)
     boss_blood_reward = count_boss_reward(next_boss_blood, boss_blood)
