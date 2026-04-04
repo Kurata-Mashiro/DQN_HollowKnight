@@ -115,8 +115,6 @@ def run_episode(hp, algorithm,agent,act_rmp_correct, move_rmp_correct,PASS_COUNT
         soul = state["souls"]
 
         enemy_skill1 = False
-        if last_enemy_y > 32 and last_enemy_y < 32.5 and enemy_y > 32 and enemy_y < 32.5:
-            enemy_skill1 = True
         last_enemy_y = enemy_y
 
         move, action = agent.sample(stations, soul, enemy_x, enemy_y, player_x, enemy_skill1)

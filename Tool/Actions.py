@@ -166,9 +166,7 @@ def Look_up():
     ReleaseKey(UP_ARROW)
 
 def restart():
-    profile = get_active_profile()
-    station_size = profile.station_size
-    _ = station_size
+    _ = get_active_profile()
     Nothing()
     time.sleep(0.5)
 

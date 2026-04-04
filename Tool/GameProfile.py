@@ -13,6 +13,7 @@ class GameProfile:
     move_names: Tuple[str, ...]
     skill_action_indices: Tuple[int, ...]
     state_fallback: Dict[str, float]
+    max_self_hp: float = 100.0
     episode_start_timeout_sec: float = 5.0
     skill_block_penalty: float = -30.0
     action_reward_close_distance: float = 5.0
@@ -42,8 +43,9 @@ ICEY_PROFILE = GameProfile(
     move_names=("Move_Left", "Move_Right", "Turn_Left", "Turn_Right"),
     skill_action_indices=(5, 6),
     state_fallback={
-        "self_hp": 9,
-        "enemy_hp": 900,
+        # Fallback values are neutral placeholders for bootstrapping when no direct telemetry is available.
+        "self_hp": 100,
+        "enemy_hp": 100,
         "self_x": 0.0,
         "self_y": 0.0,
         "enemy_x": 4.0,

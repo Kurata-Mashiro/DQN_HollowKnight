@@ -6,8 +6,6 @@ class Hp_getter():
         profile = get_active_profile()
         self.profile = profile
         self._fallback_state = dict(profile.state_fallback)
-
-        self.ready = win32gui.FindWindow(None, profile.window_title) != 0
     
     def get_souls(self):
         return self._fallback_state["souls"]
