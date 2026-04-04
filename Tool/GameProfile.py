@@ -49,7 +49,7 @@ ICEY_PROFILE = GameProfile(
     mid_range_action_indices=(2, 3, 0),
     far_range_action_index=1,
     state_fallback={
-        # Real ICEY telemetry is not implemented yet; training currently runs with this static fallback state.
+        # Vision telemetry is primary; these values are used only as per-field fallback defaults.
         "self_hp": 100,
         "enemy_hp": 100,
         "self_x": 0.0,

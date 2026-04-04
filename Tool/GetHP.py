@@ -11,7 +11,7 @@ class Hp_getter():
         self._fallback_state = dict(profile.state_fallback)
         self._last_enemy_hp = int(self._fallback_state["enemy_hp"])
 
-        # Legacy visual HP anchors (screen-space, full window capture based).
+        # Visual HP anchors (screen-space, full window capture based).
         self._player_hp_points = [(130 + i * 22, 50) for i in range(9)]
         self._boss_hp_y = 401
         self._boss_hp_start_x = 100
@@ -53,7 +53,7 @@ class Hp_getter():
                 boss_blood += 1
             else:
                 break
-        if boss_blood - self._last_enemy_hp < -300:
+        if boss_blood - self._last_enemy_hp < -500:
             return self._last_enemy_hp
         if abs(boss_blood - self._last_enemy_hp) < 3:
             return self._last_enemy_hp
