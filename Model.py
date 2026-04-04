@@ -40,11 +40,12 @@ class Model:
     def _to_tensor(self, station):
         arr = np.asarray(station, dtype=np.float32)
         if arr.ndim == 4:
-            # Single sample: (T, H, W, C) -> (1, T*C, H, W)
+            # Single sample: (T, H, W, C) -> (1, T*C, H, W).
+            # We intentionally fold time into channels and use 2D convs for a lighter model.
             arr = np.transpose(arr, (0, 3, 1, 2))
             arr = arr.reshape(1, arr.shape[0] * arr.shape[1], arr.shape[2], arr.shape[3])
         elif arr.ndim == 5:
-            # Batch sample: (N, T, H, W, C) -> (N, T*C, H, W)
+            # Batch sample: (N, T, H, W, C) -> (N, T*C, H, W), same temporal folding strategy.
             arr = np.transpose(arr, (0, 1, 4, 2, 3))
             arr = arr.reshape(arr.shape[0], arr.shape[1] * arr.shape[2], arr.shape[3], arr.shape[4])
         else:

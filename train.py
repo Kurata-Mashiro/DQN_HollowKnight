@@ -79,15 +79,18 @@ def run_episode(hp, algorithm,agent,act_rmp_correct, move_rmp_correct,PASS_COUNT
     DelayDirection = collections.deque(maxlen=DELAY_REWARD)
     
     episode_start_time = time.time()
-    while True:
-        state = hp.get_state()
-        boss_hp_value = state["enemy_hp"]
-        self_hp = state["self_hp"]
-        if boss_hp_value >= 0 and self_hp >= 0:
-            break
-        if time.time() - episode_start_time > PROFILE.episode_start_timeout_sec:
-            break
-        time.sleep(0.1)
+    if hp.has_realtime_telemetry:
+        while True:
+            state = hp.get_state()
+            boss_hp_value = state["enemy_hp"]
+            self_hp = state["self_hp"]
+            if boss_hp_value >= 0 and self_hp >= 0:
+                break
+            if time.time() - episode_start_time > PROFILE.episode_start_timeout_sec:
+                break
+            time.sleep(0.1)
+    else:
+        time.sleep(0.2)
         
 
     thread1 = FrameBuffer(1, "FrameBuffer", WIDTH, HEIGHT, maxlen=FRAMEBUFFERSIZE, station_size=station_size, window_title=PROFILE.window_title)

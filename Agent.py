@@ -64,7 +64,7 @@ class Agent:
             if mid_range_action_indices:
                 return int(np.random.choice(mid_range_action_indices))
             return int(np.random.randint(self.act_dim))
-        if self.act_dim > 4:
-            return 4
+        if 0 <= profile.far_range_action_index < self.act_dim:
+            return int(profile.far_range_action_index)
         return max(0, self.act_dim - 1)
                 

@@ -14,6 +14,7 @@ class GameProfile:
     skill_action_indices: Tuple[int, ...]
     state_fallback: Dict[str, float]
     mid_range_action_indices: Tuple[int, ...] = (0, 2, 3)
+    far_range_action_index: int = 1
     max_self_hp: float = 100.0
     episode_start_timeout_sec: float = 5.0
     max_episode_step: int = 600
@@ -46,6 +47,7 @@ ICEY_PROFILE = GameProfile(
     move_names=("Move_Left", "Move_Right"),
     skill_action_indices=(),
     mid_range_action_indices=(2, 3, 0),
+    far_range_action_index=1,
     state_fallback={
         # Real ICEY telemetry is not implemented yet; training currently runs with this static fallback state.
         "self_hp": 100,
