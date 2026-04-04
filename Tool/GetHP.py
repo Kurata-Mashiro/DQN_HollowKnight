@@ -80,7 +80,7 @@ class Hp_getter():
         return offset_address.value
 
 
-    # This function gets hp for the current target enemy using Hollow Knight offsets.
+    # This function gets HP for the current target enemy using Hollow Knight offsets.
     def get_boss_hp(self):
         if not self.ready:
             return self._fallback_state["enemy_hp"]

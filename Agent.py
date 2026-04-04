@@ -12,14 +12,8 @@ class Agent:
         self.skill_block_penalty = -30
 
 
-    def sample(self, station, soul, enemy_x=None, enemy_y=None, player_x=None, enemy_skill1=False):
+    def sample(self, station, soul, enemy_x, enemy_y, player_x, enemy_skill1):
         profile = get_active_profile()
-        if enemy_x is None:
-            enemy_x = 0.0
-        if enemy_y is None:
-            enemy_y = 0.0
-        if player_x is None:
-            player_x = 0.0
         
         pred_move, pred_act = self.algorithm.model.predict(station)
         # print(pred_move)

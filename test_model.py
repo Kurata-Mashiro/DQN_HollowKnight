@@ -91,6 +91,7 @@ def run_episode(hp, algorithm,agent,act_rmp_correct,act_rmp_wrong, move_rmp_corr
         state = hp.get_state()
         boss_hp_value = state["enemy_hp"]
         self_hp = state["self_hp"]
+        # For non-Hollow Knight profiles we don't have a strict pre-fight HP signature.
         if PROFILE.name != "hollow_knight":
             break
         if boss_hp_value > 800 and  boss_hp_value <= 900 and self_hp >= 1 and self_hp <= 9:
