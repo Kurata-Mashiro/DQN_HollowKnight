@@ -123,7 +123,7 @@ def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, next_
     time_penalty = profile.action_time_penalty
     reward = self_blood_reward + boss_blood_reward + distance_reward + time_penalty
 
-    if next_self_blood <= 0 and self_blood != get_active_profile().max_self_hp:
+    if next_self_blood <= 0 and self_blood != profile.max_self_hp:
         return reward - 40, 1
     if next_boss_blood <= 0:
         return reward + 60, 2

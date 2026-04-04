@@ -78,14 +78,14 @@ def run_episode(hp, algorithm,agent,act_rmp_correct, move_rmp_correct,PASS_COUNT
     DelayActions = collections.deque(maxlen=DELAY_REWARD)
     DelayDirection = collections.deque(maxlen=DELAY_REWARD)
     
-    start_wait = time.time()
+    start_wait_time = time.time()
     while True:
         state = hp.get_state()
         boss_hp_value = state["enemy_hp"]
         self_hp = state["self_hp"]
         if boss_hp_value >= 0 and self_hp >= 0:
             break
-        if time.time() - start_wait > PROFILE.episode_start_timeout_sec:
+        if time.time() - start_wait_time > PROFILE.episode_start_timeout_sec:
             break
         time.sleep(0.1)
         
@@ -113,9 +113,8 @@ def run_episode(hp, algorithm,agent,act_rmp_correct, move_rmp_correct,PASS_COUNT
         enemy_x, enemy_y = state["enemy_x"], state["enemy_y"]
         soul = state["souls"]
 
-        enemy_skill1 = False
-
-        move, action = agent.sample(stations, soul, enemy_x, enemy_y, player_x, enemy_skill1)
+        # ICEY runtime currently does not provide an enemy-skill detector.
+        move, action = agent.sample(stations, soul, enemy_x, enemy_y, player_x, False)
 
         
         # action = 0
@@ -133,7 +132,7 @@ def run_episode(hp, algorithm,agent,act_rmp_correct, move_rmp_correct,PASS_COUNT
         next_enemy_x, next_enemy_y = next_state["enemy_x"], next_state["enemy_y"]
 
         # get reward
-        move_reward = Tool.Helper.move_judge(self_hp, next_self_hp, player_x, next_player_x, enemy_x, next_enemy_x, move, enemy_skill1)
+        move_reward = Tool.Helper.move_judge(self_hp, next_self_hp, player_x, next_player_x, enemy_x, next_enemy_x, move, False)
         # print(move_reward)
         act_reward, done = Tool.Helper.action_judge(
             boss_hp_value,
@@ -144,7 +143,7 @@ def run_episode(hp, algorithm,agent,act_rmp_correct, move_rmp_correct,PASS_COUNT
             next_enemy_x,
             next_enemy_y,
             action,
-            enemy_skill1,
+            False,
         )
             # print(reward)
         # print( action_name[action], ", ", move_name[d], ", ", reward)
