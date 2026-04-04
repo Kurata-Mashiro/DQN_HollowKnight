@@ -22,15 +22,17 @@ from Tool.WindowsAPI import grab_screen
 from Tool.GetHP import Hp_getter
 from Tool.UserInput import User
 from Tool.FrameBuffer import FrameBuffer
+from Tool.GameProfile import get_active_profile
 
+PROFILE = get_active_profile()
 window_size = (0,0,1920,1017)
-station_size = (230, 230, 1670, 930)
+station_size = PROFILE.station_size
 
 HP_WIDTH = 768
 HP_HEIGHT = 407
-WIDTH = 400
-HEIGHT = 200
-ACTION_DIM = 7
+WIDTH = PROFILE.frame_size[0]
+HEIGHT = PROFILE.frame_size[1]
+ACTION_DIM = PROFILE.action_dim
 FRAMEBUFFERSIZE = 4
 INPUT_SHAPE = (FRAMEBUFFERSIZE, HEIGHT, WIDTH, 3)
 
@@ -41,11 +43,8 @@ BATCH_SIZE = 24  # 每次给agent learn的数据数量，从replay memory随机�
 LEARNING_RATE = 0.00001  # 学习率
 GAMMA = 0.99  # reward 的衰减因子，一般取 0.9 到 0.999 不等
 
-action_name = ["Attack", "Attack_Up",
-           "Short_Jump", "Mid_Jump", "Skill_Up", 
-           "Skill_Down", "Rush", "Cure"]
-
-move_name = ["Move_Left", "Move_Right", "Turn_Left", "Turn_Right"]
+action_name = list(PROFILE.action_names)
+move_name = list(PROFILE.move_names)
 
 DELAY_REWARD = 1
 
@@ -118,4 +117,3 @@ if __name__ == '__main__':
     #         model.save_mode()
     #     episode += 1  
     #     print("Episode: ", episode)
-

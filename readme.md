@@ -21,6 +21,24 @@
 - Let the little knight stand in front of the statue of the boss in the godhome
 - Press `F1` to start trainning. (Also you can use `F1` to stop trainning)
 
+### Multi-game profile (Hollow Knight / ICEY)
+
+- The project now supports profile-based adaptation through `Tool/GameProfile.py`.
+- Set environment variable `RL_GAME_PROFILE` before running:
+  - `hollow_knight` (default)
+  - `icey`
+- Example:
+  - Windows CMD: `set RL_GAME_PROFILE=icey`
+  - PowerShell: `$env:RL_GAME_PROFILE="icey"`
+- For ICEY, update profile fields in `Tool/GameProfile.py`:
+  - `window_title`
+  - `station_size`
+  - `frame_size`
+  - `action_names`
+  - `skill_action_indices`
+- `Tool/GetHP.py` keeps Hollow Knight memory offsets and provides fallback state values for non-HollowKnight profiles.
+- `Tool/Actions.py` maps profile action names to concrete key macros, and `restart()` uses generic mode for ICEY by default.
+
 
 ## Code structure
 - Most training configuration is in `train.py`
@@ -63,5 +81,4 @@
 - Do not use skill without souls
 
 - Use more precise scoring standards
-
 
