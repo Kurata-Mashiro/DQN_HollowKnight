@@ -46,7 +46,7 @@ PROFILES: Dict[str, GameProfile] = {
         skill_action_indices=(4, 5),
         state_fallback={
             "self_hp": 9,
-            "boss_hp": 900,
+            "enemy_hp": 900,
             "self_x": 0.0,
             "self_y": 0.0,
             "enemy_x": 4.0,
@@ -73,7 +73,7 @@ PROFILES: Dict[str, GameProfile] = {
         skill_action_indices=(5, 6),
         state_fallback={
             "self_hp": 9,
-            "boss_hp": 900,
+            "enemy_hp": 900,
             "self_x": 0.0,
             "self_y": 0.0,
             "enemy_x": 4.0,

@@ -36,7 +36,7 @@
   - `frame_size`
   - `action_names`
   - `skill_action_indices`
-- `Tool/GetHP.py` keeps Hollow Knight memory offsets and provides fallback state values for non-HollowKnight profiles.
+- `Tool/GetHP.py` keeps Hollow Knight memory offsets and provides fallback state values for non-Hollow Knight profiles.
 - `Tool/Actions.py` maps profile action names to concrete key macros, and `restart()` uses generic mode for ICEY by default.
 
 
@@ -81,4 +81,3 @@
 - Do not use skill without souls
 
 - Use more precise scoring standards
-

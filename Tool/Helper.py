@@ -62,12 +62,12 @@ def distance_reward(move, next_player_x, next_hornet_x):
         else:
             return -2
 
-def move_judge(self_blood, next_self_blood, player_x, next_player_x, hornet_x, next_hornet_x, move, hornet_skill1):
+def move_judge(self_blood, next_self_blood, player_x, next_player_x, enemy_x, next_enemy_x, move, hornet_skill1):
     profile = get_active_profile()
     if profile.name != "hollow_knight":
         hp_reward = count_self_reward(next_self_blood, self_blood)
-        distance_now = abs(player_x - hornet_x)
-        distance_next = abs(next_player_x - next_hornet_x)
+        distance_now = abs(player_x - enemy_x)
+        distance_next = abs(next_player_x - next_enemy_x)
         distance_delta = distance_now - distance_next
         reward = hp_reward + distance_delta * 2
         if move < 2 and distance_next > 8:
@@ -82,13 +82,13 @@ def move_judge(self_blood, next_self_blood, player_x, next_player_x, hornet_x, n
     
     if hornet_skill1:
         # run away while distance < 5
-        if abs(player_x - hornet_x) < 6:
+        if abs(player_x - enemy_x) < 6:
             # change direction while hornet use skill
             if move == 0 or move == 2:
                 dire = 1
             else:
                 dire = -1
-            if player_x - hornet_x > 0:
+            if player_x - enemy_x > 0:
                 s = -1
             else:
                 s = 1
@@ -101,8 +101,8 @@ def move_judge(self_blood, next_self_blood, player_x, next_player_x, hornet_x, n
                 return 10
         return -10
 
-    dis = abs(player_x - hornet_x)
-    dire = player_x - hornet_x
+    dis = abs(player_x - enemy_x)
+    dire = player_x - enemy_x
     if move == 0:
         if (dis > 5 and dire > 0) or (dis < 2.5 and dire < 0):
             return 10

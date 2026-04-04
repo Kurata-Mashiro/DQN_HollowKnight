@@ -80,10 +80,10 @@ class Hp_getter():
         return offset_address.value
 
 
-    # This function can only get hp of hornet yet
+    # This function gets hp for the current target enemy using Hollow Knight offsets.
     def get_boss_hp(self):
         if not self.ready:
-            return self._fallback_state["boss_hp"]
+            return self._fallback_state["enemy_hp"]
         base_address = self.UnityPlayer + 0x00FEF994 
         offset_address = ctypes.c_long()
         offset_list = [0x54, 0x8, 0x1C, 0x1C, 0x7C, 0x18, 0xAC]
