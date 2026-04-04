@@ -9,7 +9,6 @@ class Agent:
         self.algorithm = algorithm
         self.e_greed = e_greed
         self.e_greed_decrement = e_greed_decrement
-        self.skill_block_penalty = -30
 
 
     def sample(self, station, soul, enemy_x, enemy_y, player_x, enemy_skill1):
@@ -36,7 +35,7 @@ class Agent:
             if soul < 33:
                 for skill_idx in profile.skill_action_indices:
                     if skill_idx < pred_act.shape[1]:
-                        pred_act[0][skill_idx] = self.skill_block_penalty
+                        pred_act[0][skill_idx] = profile.skill_block_penalty
             act = np.argmax(pred_act)
 
         self.e_greed = max(

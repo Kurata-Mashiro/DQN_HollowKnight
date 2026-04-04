@@ -89,6 +89,7 @@ def run_episode(hp, algorithm,agent,act_rmp_correct, move_rmp_correct,PASS_COUNT
             break
         if time.time() - start_wait > PROFILE.episode_start_timeout_sec:
             break
+        time.sleep(0.1)
         
 
     thread1 = FrameBuffer(1, "FrameBuffer", WIDTH, HEIGHT, maxlen=FRAMEBUFFERSIZE, station_size=station_size, window_title=PROFILE.window_title)

@@ -55,6 +55,7 @@ class Hp_getter():
                 self.UnityPlayer = i.value
             if temp[-8:] == "mono.dll":
                 self.mono = i.value
+        Kernel32.CloseHandle(hProcess)
         self.ready = self.UnityPlayer is not None and self.mono is not None
     
     def get_souls(self):
