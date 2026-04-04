@@ -162,12 +162,12 @@ def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, next_
         self_blood_reward = count_self_reward(next_self_blood, self_blood)
         boss_blood_reward = count_boss_reward(next_boss_blood, boss_blood)
         distance_reward = 0
-        if abs(next_player_x - next_enemy_x) < 5 and action in (0, 1):
-            distance_reward += 1.5
-        if abs(next_player_x - next_enemy_x) > 8 and action in (0, 1):
-            distance_reward -= 1.5
+        if abs(next_player_x - next_enemy_x) < profile.action_reward_close_distance and action in (0, 1):
+            distance_reward += profile.action_reward_hit_bonus
+        if abs(next_player_x - next_enemy_x) > profile.action_reward_far_distance and action in (0, 1):
+            distance_reward += profile.action_reward_whiff_penalty
 
-        time_penalty = -0.2
+        time_penalty = profile.action_time_penalty
         reward = self_blood_reward + boss_blood_reward + distance_reward + time_penalty
 
         if next_self_blood <= 0 and self_blood != 9:

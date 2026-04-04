@@ -95,7 +95,7 @@ def run_episode(hp, algorithm,agent,act_rmp_correct,act_rmp_wrong, move_rmp_corr
             break
         if boss_hp_value > 800 and  boss_hp_value <= 900 and self_hp >= 1 and self_hp <= 9:
             break
-        if time.time() - start_wait > 5:
+        if time.time() - start_wait > PROFILE.episode_start_timeout_sec:
             break
         
 

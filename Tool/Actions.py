@@ -207,6 +207,7 @@ ACTION_FUNC_MAP = {
     "Skill_Down": Skill_Down,
     "Rush": Rush,
     "Cure": Cure,
+    # ICEY profile aliases to reuse existing low-level macros.
     "Light_Attack": Attack,
     "Heavy_Attack": Attack_Up,
     "Dash": Rush,

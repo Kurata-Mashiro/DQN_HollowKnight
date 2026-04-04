@@ -9,6 +9,7 @@ class Agent:
         self.algorithm = algorithm
         self.e_greed = e_greed
         self.e_greed_decrement = e_greed_decrement
+        self.skill_block_penalty = -30
 
 
     def sample(self, station, soul, enemy_x=None, enemy_y=None, player_x=None, enemy_skill1=False):
@@ -27,7 +28,7 @@ class Agent:
         pred_act = pred_act.numpy()
         sample = np.random.rand()  
         if sample < self.e_greed:
-            move = self.better_move(enemy_x, player_x, enemy_skill1, profile.name)
+            move = self.better_move(enemy_x, player_x, enemy_skill1, profile)
         else:
             move = np.argmax(pred_move)
         self.e_greed = max(
@@ -35,23 +36,23 @@ class Agent:
 
         sample = np.random.rand() 
         if sample < self.e_greed:
-            act = self.better_action(soul, enemy_x, enemy_y, player_x, enemy_skill1, profile.name)
+            act = self.better_action(soul, enemy_x, enemy_y, player_x, enemy_skill1, profile)
         else:
             act = np.argmax(pred_act)
             if soul < 33:
                 for skill_idx in profile.skill_action_indices:
                     if skill_idx < pred_act.shape[1]:
-                        pred_act[0][skill_idx] = -30
+                        pred_act[0][skill_idx] = self.skill_block_penalty
             act = np.argmax(pred_act)
 
         self.e_greed = max(
             0.03, self.e_greed - self.e_greed_decrement)  
         return move, act
     
-    def better_move(self, enemy_x, player_x, enemy_skill1, profile_name):
+    def better_move(self, enemy_x, player_x, enemy_skill1, profile):
         dis = abs(player_x - enemy_x)
         dire = player_x - enemy_x
-        if profile_name == "hollow_knight":
+        if profile.name == "hollow_knight":
             if enemy_skill1:
                 if dis < 6:
                     return 1 if dire > 0 else 0
@@ -68,9 +69,9 @@ class Agent:
             return 1 if dire > 0 else 0
         return 2 if dire > 0 else 3
 
-    def better_action(self, soul, enemy_x, enemy_y, player_x, enemy_skill1, profile_name):
+    def better_action(self, soul, enemy_x, enemy_y, player_x, enemy_skill1, profile):
         dis = abs(player_x - enemy_x)
-        if profile_name == "hollow_knight":
+        if profile.name == "hollow_knight":
             if enemy_skill1:
                 if dis < 3:
                     return 6

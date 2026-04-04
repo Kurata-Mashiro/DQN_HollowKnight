@@ -12,6 +12,14 @@ class GameProfile:
     action_names: Tuple[str, ...]
     move_names: Tuple[str, ...]
     skill_action_indices: Tuple[int, ...]
+    state_fallback: Dict[str, float]
+    episode_start_timeout_sec: float = 5.0
+    skill_block_penalty: float = -30.0
+    action_reward_close_distance: float = 5.0
+    action_reward_far_distance: float = 8.0
+    action_reward_hit_bonus: float = 1.5
+    action_reward_whiff_penalty: float = -1.5
+    action_time_penalty: float = -0.2
     restart_mode: str = "generic"
 
     @property
@@ -36,6 +44,15 @@ PROFILES: Dict[str, GameProfile] = {
         ),
         move_names=("Move_Left", "Move_Right", "Turn_Left", "Turn_Right"),
         skill_action_indices=(4, 5),
+        state_fallback={
+            "self_hp": 9,
+            "boss_hp": 900,
+            "self_x": 0.0,
+            "self_y": 0.0,
+            "enemy_x": 4.0,
+            "enemy_y": 0.0,
+            "souls": 99,
+        },
         restart_mode="hollow_knight",
     ),
     "icey": GameProfile(
@@ -54,6 +71,15 @@ PROFILES: Dict[str, GameProfile] = {
         ),
         move_names=("Move_Left", "Move_Right", "Turn_Left", "Turn_Right"),
         skill_action_indices=(5, 6),
+        state_fallback={
+            "self_hp": 9,
+            "boss_hp": 900,
+            "self_x": 0.0,
+            "self_y": 0.0,
+            "enemy_x": 4.0,
+            "enemy_y": 0.0,
+            "souls": 99,
+        },
         restart_mode="generic",
     ),
 }

@@ -29,15 +29,7 @@ class Hp_getter():
         profile = get_active_profile()
         self.profile = profile
         self.hx = 0
-        self._fallback_state = {
-            "self_hp": 9,
-            "boss_hp": 900,
-            "self_x": 0.0,
-            "self_y": 0.0,
-            "enemy_x": 4.0,
-            "enemy_y": 0.0,
-            "souls": 99,
-        }
+        self._fallback_state = dict(profile.state_fallback)
 
         hd = win32gui.FindWindow(None, profile.window_title)
         self.ready = False
