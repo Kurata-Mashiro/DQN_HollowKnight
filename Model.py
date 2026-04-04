@@ -41,6 +41,7 @@ class Model:
         arr = np.asarray(station, dtype=np.float32)
         if arr.ndim == 4:
             # Single sample: (T, H, W, C) -> (1, T*C, H, W).
+            # With default settings this is 4 * 3 = 12 channels.
             # We intentionally fold time into channels and use 2D convs for a lighter model.
             arr = np.transpose(arr, (0, 3, 1, 2))
             arr = arr.reshape(1, arr.shape[0] * arr.shape[1], arr.shape[2], arr.shape[3])

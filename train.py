@@ -78,7 +78,7 @@ def run_episode(hp, algorithm,agent,act_rmp_correct, move_rmp_correct,PASS_COUNT
     DelayActions = collections.deque(maxlen=DELAY_REWARD)
     DelayDirection = collections.deque(maxlen=DELAY_REWARD)
     
-    episode_start_time = time.time()
+    start_wait_time = time.time()
     if hp.has_realtime_telemetry:
         while True:
             state = hp.get_state()
@@ -86,7 +86,7 @@ def run_episode(hp, algorithm,agent,act_rmp_correct, move_rmp_correct,PASS_COUNT
             self_hp = state["self_hp"]
             if boss_hp_value >= 0 and self_hp >= 0:
                 break
-            if time.time() - episode_start_time > PROFILE.episode_start_timeout_sec:
+            if time.time() - start_wait_time > PROFILE.episode_start_timeout_sec:
                 break
             time.sleep(0.1)
     else:

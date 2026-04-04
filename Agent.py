@@ -60,7 +60,7 @@ class Agent:
         if dis < 2.5:
             return 0
         if dis < 6:
-            # Prefer profile-defined mid-range subset during medium spacing.
+            # Prefer profile-defined mid-range subset for distance < 6.
             if mid_range_action_indices:
                 return int(np.random.choice(mid_range_action_indices))
             return int(np.random.randint(self.act_dim))
