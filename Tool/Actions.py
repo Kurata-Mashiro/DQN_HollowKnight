@@ -166,7 +166,7 @@ def Look_up():
     ReleaseKey(UP_ARROW)
 
 def restart():
-    # ICEY restart placeholder: keep neutral input and give game a short settle delay.
+    # ICEY restart behavior: neutralize input and give a short settle delay before next episode.
     Nothing()
     time.sleep(0.5)
 

@@ -64,13 +64,13 @@ def distance_reward(move, next_player_x, next_hornet_x):
 
 def move_judge(self_blood, next_self_blood, player_x, next_player_x, enemy_x, next_enemy_x, move, enemy_skill1):
     hp_reward = count_self_reward(next_self_blood, self_blood)
-    distance_now = abs(player_x - enemy_x)
-    distance_next = abs(next_player_x - next_enemy_x)
-    distance_delta = distance_now - distance_next
+    initial_distance = abs(player_x - enemy_x)
+    final_distance = abs(next_player_x - next_enemy_x)
+    distance_delta = initial_distance - final_distance
     reward = hp_reward + distance_delta * 2
-    if move < 2 and distance_next > 8:
+    if move < 2 and final_distance > 8:
         reward += 1
-    if move >= 2 and distance_next < 2:
+    if move >= 2 and final_distance < 2:
         reward -= 1
     return reward
 

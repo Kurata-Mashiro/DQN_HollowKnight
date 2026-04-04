@@ -44,7 +44,7 @@ ICEY_PROFILE = GameProfile(
     move_names=("Move_Left", "Move_Right", "Turn_Left", "Turn_Right"),
     skill_action_indices=(5, 6),
     state_fallback={
-        # Fallback values are neutral placeholders for bootstrapping when no direct telemetry is available.
+        # In the current ICEY runtime these fallback values are the active telemetry source.
         "self_hp": 100,
         "enemy_hp": 100,
         "self_x": 0.0,
