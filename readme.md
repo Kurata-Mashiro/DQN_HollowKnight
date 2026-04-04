@@ -31,7 +31,7 @@ Other actions are removed from the runtime action space.
 ## Current Runtime Notes
 
 - This repository is now ICEY-only runtime.
-- `Tool/GetHP.py` currently uses fallback state values (no Hollow Knight memory offset logic).
+- `Tool/GetHP.py` now uses a vision-based telemetry path first (HP/position estimated from screen), with per-field fallback values when detection is unavailable.
 - Episode has a max step cap to avoid hanging.
 - Action/move space is defined in `Tool/GameProfile.py` (ICEY profile).
 
