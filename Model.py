@@ -68,10 +68,14 @@ class Model:
         move_path = "./model/move_part.pt"
         if os.path.exists(act_path):
             print("load action model")
-            self.private_act_model.load_state_dict(torch.load(act_path, map_location=self.device))
+            self.private_act_model.load_state_dict(
+                torch.load(act_path, map_location=self.device, weights_only=True)
+            )
         if os.path.exists(move_path):
             print("load move model")
-            self.private_move_model.load_state_dict(torch.load(move_path, map_location=self.device))
+            self.private_move_model.load_state_dict(
+                torch.load(move_path, map_location=self.device, weights_only=True)
+            )
 
     def save_mode(self):
         os.makedirs("./model", exist_ok=True)
