@@ -15,6 +15,7 @@ I = 0x49
 J = 0x4A
 O = 0x4F
 SPACE = 0x20
+ENTER = 0x0D
 
 # move actions
 # 0
@@ -58,9 +59,25 @@ def Heavy_Attack():
     time.sleep(0.01)
 
 def restart():
-    # ICEY restart behavior: neutralize input and give a short settle delay before next episode.
+    profile = get_active_profile()
     Nothing()
-    time.sleep(0.5)
+    if profile.restart_mode == "icey_first_boss_route":
+        time.sleep(0.2)
+        PressKey(ENTER)
+        time.sleep(0.08)
+        ReleaseKey(ENTER)
+        time.sleep(1.0)
+        PressKey(D)
+        time.sleep(5.0)
+        ReleaseKey(D)
+        time.sleep(0.2)
+        PressKey(D)
+        time.sleep(5.0)
+        ReleaseKey(D)
+        time.sleep(0.3)
+    else:
+        # ICEY restart behavior: neutralize input and give a short settle delay before next episode.
+        time.sleep(0.5)
 
 
 ACTION_FUNC_MAP = {

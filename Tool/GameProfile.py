@@ -66,7 +66,7 @@ ICEY_PROFILE = GameProfile(
     action_reward_hit_bonus=1.5,
     action_reward_whiff_penalty=-1.5,
     action_time_penalty=-0.2,
-    restart_mode="generic",
+    restart_mode="icey_first_boss_route",
 )
 
 
