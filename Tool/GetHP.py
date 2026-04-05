@@ -59,7 +59,7 @@ class Hp_getter():
     def _stabilize_enemy_hp(self, boss_blood):
         if self._last_enemy_hp <= 0:
             return boss_blood
-        if boss_blood > self._last_enemy_hp and (boss_blood - self._last_enemy_hp) > abs(self._boss_hp_sudden_drop_limit):
+        if (boss_blood - self._last_enemy_hp) < self._boss_hp_sudden_drop_limit:
             return self._last_enemy_hp
         if abs(boss_blood - self._last_enemy_hp) < self._boss_hp_stability_tolerance:
             return self._last_enemy_hp
