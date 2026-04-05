@@ -52,8 +52,9 @@ MAX_EPISODE_STEP = PROFILE.max_episode_step
 
 
 def run_episode(hp, algorithm,agent,act_rmp_correct, move_rmp_correct,PASS_COUNT,paused):
-    recover_and_enter_boss_if_needed()
-    restart()
+    entered_boss = recover_and_enter_boss_if_needed()
+    if not entered_boss:
+        restart()
     # learn while load game
     for i in range(8):
         if (len(move_rmp_correct) > MEMORY_WARMUP_SIZE):
