@@ -17,6 +17,14 @@ O = 0x4F
 SPACE = 0x20
 ENTER = 0x0D
 
+# Timings for ICEY first-boss retry flow.
+ICEY_RETRY_DIALOG_SETTLE_SEC = 0.2
+ICEY_ENTER_HOLD_SEC = 0.08
+ICEY_POST_ENTER_WAIT_SEC = 1.0
+ICEY_SCENE_TRAVEL_RIGHT_SEC = 5.0
+ICEY_SCENE_SETTLE_SEC = 0.2
+ICEY_POST_ROUTE_WAIT_SEC = 0.3
+
 # move actions
 # 0
 def Nothing():
@@ -62,19 +70,19 @@ def restart():
     profile = get_active_profile()
     Nothing()
     if profile.restart_mode == "icey_first_boss_route":
-        time.sleep(0.2)
+        time.sleep(ICEY_RETRY_DIALOG_SETTLE_SEC)
         PressKey(ENTER)
-        time.sleep(0.08)
+        time.sleep(ICEY_ENTER_HOLD_SEC)
         ReleaseKey(ENTER)
-        time.sleep(1.0)
+        time.sleep(ICEY_POST_ENTER_WAIT_SEC)
         PressKey(D)
-        time.sleep(5.0)
+        time.sleep(ICEY_SCENE_TRAVEL_RIGHT_SEC)
         ReleaseKey(D)
-        time.sleep(0.2)
+        time.sleep(ICEY_SCENE_SETTLE_SEC)
         PressKey(D)
-        time.sleep(5.0)
+        time.sleep(ICEY_SCENE_TRAVEL_RIGHT_SEC)
         ReleaseKey(D)
-        time.sleep(0.3)
+        time.sleep(ICEY_POST_ROUTE_WAIT_SEC)
     else:
         # ICEY restart behavior: neutralize input and give a short settle delay before next episode.
         time.sleep(0.5)
