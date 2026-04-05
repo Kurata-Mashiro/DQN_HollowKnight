@@ -4,22 +4,24 @@ import collections
 import cv2
 import win32gui, win32ui, win32con, win32api
 import numpy as np
-import tensorflow as tf
+from Tool.GameProfile import get_active_profile
 
 class FrameBuffer(threading.Thread):
-  def __init__(self, threadID, name, width,height,  maxlen=5):
+  def __init__(self, threadID, name, width,height,  maxlen=5, station_size=None, window_title=None):
     threading.Thread.__init__(self)
     self.threadID = threadID
     self.name = name
     self.buffer = collections.deque(maxlen=maxlen)
     self.lock = threading.Lock()
 
-    self.station_size = (230, 230, 1670, 930)
+    profile = get_active_profile()
+    self.station_size = station_size if station_size is not None else profile.station_size
     self.WIDTH = width
     self.HEIGHT = height
     self._stop_event = threading.Event()
     
-    self.hwnd = win32gui.FindWindow(None,'Hollow Knight')
+    active_window_title = window_title if window_title is not None else profile.window_title
+    self.hwnd = win32gui.FindWindow(None, active_window_title)
     self.left,self.top,x2,y2 = self.station_size
     self.width = x2 - self.left + 1
     self.height = y2 - self.top + 1
@@ -43,7 +45,7 @@ class FrameBuffer(threading.Thread):
   def get_frame(self):
     self.lock.acquire(blocking=True)
     station = cv2.resize(cv2.cvtColor(self.grab_screen(), cv2.COLOR_RGBA2RGB),(self.WIDTH,self.HEIGHT))
-    self.buffer.append(tf.convert_to_tensor(station))
+    self.buffer.append(station.astype(np.float32))
     self.lock.release()
 
   def get_buffer(self):

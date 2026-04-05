@@ -1,4 +1,5 @@
 from Tool.WindowsAPI import key_check
+from Tool.GameProfile import get_active_profile
 import time
 
 
@@ -61,51 +62,17 @@ def distance_reward(move, next_player_x, next_hornet_x):
         else:
             return -2
 
-def move_judge(self_blood, next_self_blood, player_x, next_player_x, hornet_x, next_hornet_x, move, hornet_skill1):
-    # reward = count_self_reward(next_self_blood, self_blood)
-    # if reward < 0:
-    #     return reward
-
-    
-    if hornet_skill1:
-        # run away while distance < 5
-        if abs(player_x - hornet_x) < 6:
-            # change direction while hornet use skill
-            if move == 0 or move == 2:
-                dire = 1
-            else:
-                dire = -1
-            if player_x - hornet_x > 0:
-                s = -1
-            else:
-                s = 1
-            # if direction is correct and use long move
-            if dire * s == 1 and move < 2:
-                return 10
-        # do not do long move while distance > 5
-        else:
-            if move >= 2:
-                return 10
-        return -10
-
-    dis = abs(player_x - hornet_x)
-    dire = player_x - hornet_x
-    if move == 0:
-        if (dis > 5 and dire > 0) or (dis < 2.5 and dire < 0):
-            return 10
-    elif move == 1:
-        if (dis > 5 and dire < 0) or (dis < 2.5 and dire > 0):
-            return 10
-    elif move == 2:
-        if dis > 2.5 and dis < 5 and dire > 0:
-            return 10
-    elif move == 3:
-        if dis > 2.5 and dis < 5 and dire < 0:
-            return 10
-            
-        
-    # reward = direction_reward(move, player_x, hornet_x) + distance_reward(move, player_x, hornet_x)
-    return -10
+def move_judge(self_blood, next_self_blood, player_x, next_player_x, enemy_x, next_enemy_x, move, enemy_skill1):
+    hp_reward = count_self_reward(next_self_blood, self_blood)
+    initial_distance = abs(player_x - enemy_x)
+    final_distance = abs(next_player_x - next_enemy_x)
+    distance_delta = initial_distance - final_distance
+    reward = hp_reward + distance_delta * 2
+    if move in (0, 1) and final_distance > 8:
+        reward += 1
+    if move in (0, 1) and final_distance < 2:
+        reward -= 1
+    return reward
 
 
 
@@ -143,48 +110,24 @@ def act_distance_reward(action, next_player_x, next_hornet_x, next_hornet_y):
     return distance_reward
 
 # JUDGEMENT FUNCTION, write yourself
-def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, next_player_x, next_hornet_x,next_hornet_y, action, hornet_skill1):
-    # Player dead
-    if next_self_blood <= 0 and self_blood != 9:    
-        skill_reward = act_skill_reward(hornet_skill1, action, next_hornet_x, next_hornet_y, next_player_x)
-        distance_reward = act_distance_reward(action, next_player_x, next_hornet_x, next_hornet_y)
-        self_blood_reward = count_self_reward(next_self_blood, self_blood)
-        boss_blood_reward = count_boss_reward(next_boss_blood, boss_blood)
-        reward = self_blood_reward + boss_blood_reward + distance_reward + skill_reward
-        if action == 4:
-            reward *= 1.5
-        elif action == 5:
-            reward *= 0.5
-        done = 1
-        return reward, done
-    #boss dead
+def action_judge(boss_blood, next_boss_blood, self_blood, next_self_blood, next_player_x, next_enemy_x,next_enemy_y, action, enemy_skill1):
+    profile = get_active_profile()
+    self_blood_reward = count_self_reward(next_self_blood, self_blood)
+    boss_blood_reward = count_boss_reward(next_boss_blood, boss_blood)
+    distance_reward = 0
+    if abs(next_player_x - next_enemy_x) < profile.action_reward_close_distance and action in (0, 1):
+        distance_reward += profile.action_reward_hit_bonus
+    if abs(next_player_x - next_enemy_x) > profile.action_reward_far_distance and action in (0, 1):
+        distance_reward += profile.action_reward_whiff_penalty
 
-    elif next_boss_blood <= 0 or next_boss_blood > 900:   
-        skill_reward = act_skill_reward(hornet_skill1, action, next_hornet_x, next_hornet_y, next_player_x)
-        distance_reward = act_distance_reward(action, next_player_x, next_hornet_x, next_hornet_y)
-        self_blood_reward = count_self_reward(next_self_blood, self_blood)
-        boss_blood_reward = count_boss_reward(next_boss_blood, boss_blood)
-        reward = self_blood_reward + boss_blood_reward + distance_reward + skill_reward
-        if action == 4:
-            reward *= 1.5
-        elif action == 5:
-            reward *= 0.5
-        done = 2
-        return reward, done
-    # playing
-    else:
-        skill_reward = act_skill_reward(hornet_skill1, action, next_hornet_x, next_hornet_y, next_player_x)
-        distance_reward = act_distance_reward(action, next_player_x, next_hornet_x, next_hornet_y)
-        self_blood_reward = count_self_reward(next_self_blood, self_blood)
-        boss_blood_reward = count_boss_reward(next_boss_blood, boss_blood)
+    time_penalty = profile.action_time_penalty
+    reward = self_blood_reward + boss_blood_reward + distance_reward + time_penalty
 
-        reward = self_blood_reward + boss_blood_reward + distance_reward + skill_reward
-        if action == 4:
-            reward *= 1.5
-        elif action == 5:
-            reward *= 0.5
-        done = 0
-        return reward, done
+    if next_self_blood <= 0 and self_blood > 0:
+        return reward - 40, 1
+    if next_boss_blood <= 0:
+        return reward + 60, 2
+    return reward, 0
 
 # Paused training
 def pause_game(paused):

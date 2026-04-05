@@ -6,197 +6,155 @@ from Tool.WindowsAPI import grab_screen
 import time
 import cv2
 import threading
+from Tool.GameProfile import get_active_profile
+from Tool.TextVision import capture_and_detect_keywords
 
 # Hash code for key we may use: https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes?redirectedfrom=MSDN
-UP_ARROW = 0x26
-DOWN_ARROW = 0x28
-LEFT_ARROW = 0x25
-RIGHT_ARROW = 0x27
-
-L_SHIFT = 0xA0
 A = 0x41
-C = 0x43
-X = 0x58
-Z = 0x5A
+D = 0x44
+I = 0x49
+J = 0x4A
+O = 0x4F
+SPACE = 0x20
+ENTER = 0x0D
+L = 0x4C
+
+# Timings for ICEY first-boss retry flow.
+ICEY_RETRY_DIALOG_SETTLE_SEC = 0.2
+ICEY_ENTER_HOLD_SEC = 0.08
+ICEY_POST_ENTER_WAIT_SEC = 1.0
+ICEY_SCENE_TRAVEL_RIGHT_SEC = 5.0
+ICEY_SCENE_SETTLE_SEC = 0.2
+ICEY_POST_ROUTE_WAIT_SEC = 0.3
+TEXT_POLL_INTERVAL_SEC = 0.2
+RECOVERY_MAX_WAIT_SEC = 30.0
+BOSS_WAIT_MAX_SEC = 30.0
 
 # move actions
 # 0
 def Nothing():
-    ReleaseKey(LEFT_ARROW)
-    ReleaseKey(RIGHT_ARROW)
+    ReleaseKey(A)
+    ReleaseKey(D)
     pass
 
 # Move
 # 0
 def Move_Left():
-    PressKey(LEFT_ARROW)
+    PressKey(A)
     time.sleep(0.01)
 # 1
 def Move_Right():
-    PressKey(RIGHT_ARROW)
+    PressKey(D)
     time.sleep(0.01)
 
-# 2
-def Turn_Left():
-    PressKey(LEFT_ARROW)
-    time.sleep(0.01)
-    ReleaseKey(LEFT_ARROW)
-
-# 3
-def Turn_Right():
-    PressKey(RIGHT_ARROW)
-    time.sleep(0.01)
-    ReleaseKey(RIGHT_ARROW)
-
-# ----------------------------------------------------------------------
-
-# other actions
-# Attack
-# 0
-def Attack():
-    PressKey(X)
-    time.sleep(0.15)
-    ReleaseKey(X)
-    Nothing()
-    time.sleep(0.01)
-# 1
-# def Attack_Down():
-#     PressKey(DOWN_ARROW)
-#     PressKey(X)
-#     time.sleep(0.05)
-#     ReleaseKey(X)
-#     ReleaseKey(DOWN_ARROW)
-#     time.sleep(0.01)
-# 1
-def Attack_Up():
-    # print("Attack up--->")
-    PressKey(UP_ARROW)
-    PressKey(X)
-    time.sleep(0.11)
-    ReleaseKey(X)
-    ReleaseKey(UP_ARROW)
-    Nothing()
+def Jump():
+    PressKey(SPACE)
+    time.sleep(0.08)
+    ReleaseKey(SPACE)
     time.sleep(0.01)
 
-#JUMP
-# 2
-def Short_Jump():
-    PressKey(C)
-    PressKey(DOWN_ARROW)
-    PressKey(X)
-    time.sleep(0.2) 
-    ReleaseKey(X)
-    ReleaseKey(DOWN_ARROW)
-    ReleaseKey(C)
-    Nothing()
-# 3
-def Mid_Jump():
-    PressKey(C)
-    time.sleep(0.2)
-    PressKey(X)
-    time.sleep(0.2)
-    ReleaseKey(X)
-    ReleaseKey(C)
-    Nothing()
+def Dash():
+    PressKey(O)
+    time.sleep(0.08)
+    ReleaseKey(O)
+    time.sleep(0.01)
 
+def Light_Attack():
+    PressKey(J)
+    time.sleep(0.12)
+    ReleaseKey(J)
+    time.sleep(0.01)
 
-# Skill
-# 4
-# def Skill():
-#     PressKey(Z)
-#     PressKey(X)
-#     time.sleep(0.1)
-#     ReleaseKey(Z)
-#     ReleaseKey(X)
-#     time.sleep(0.01)
-# 4
-def Skill_Up():
-    PressKey(UP_ARROW)
-    PressKey(Z)
-    PressKey(X)
-    time.sleep(0.15)
-    ReleaseKey(UP_ARROW)
-    ReleaseKey(Z)
-    ReleaseKey(X)
-    Nothing()
-    time.sleep(0.15)
-# 5
-def Skill_Down():
-    PressKey(DOWN_ARROW)
-    PressKey(Z)
-    PressKey(X)
-    time.sleep(0.2)
-    ReleaseKey(X)
-    ReleaseKey(DOWN_ARROW)
-    ReleaseKey(Z)
-    Nothing()
-    time.sleep(0.3)
+def Heavy_Attack():
+    PressKey(I)
+    time.sleep(0.16)
+    ReleaseKey(I)
+    time.sleep(0.01)
 
-
-# Rush
-# 6
-def Rush():
-    PressKey(L_SHIFT)
-    time.sleep(0.1)
-    ReleaseKey(L_SHIFT)
-    Nothing()
-    PressKey(X)
-    time.sleep(0.03)
-    ReleaseKey(X)
-
-    
-
-
-
-# Cure
-def Cure():
-    PressKey(A)
-    time.sleep(1.4)
-    ReleaseKey(A)
-    time.sleep(0.1)
-
-
-# Restart function
-# it restart a new game
-# it is not in actions space
-def Look_up():
-    PressKey(UP_ARROW)
-    time.sleep(0.1)
-    ReleaseKey(UP_ARROW)
+def Execute():
+    PressKey(L)
+    time.sleep(0.08)
+    ReleaseKey(L)
+    time.sleep(0.01)
 
 def restart():
-    station_size = (230, 230, 1670, 930)
-    while True:
-        station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(1000,500))
-        if station[187][300][0] != 0: 
-            time.sleep(1)
-        else:
-            break
-    time.sleep(1)
-    Look_up()
-    time.sleep(1.5)
-    Look_up()
-    time.sleep(1)
-    while True:
-        station = cv2.resize(cv2.cvtColor(grab_screen(station_size), cv2.COLOR_RGBA2RGB),(1000,500))
-        if station[187][612][0] > 200: 
-            # PressKey(DOWN_ARROW)
-            # time.sleep(0.1)
-            # ReleaseKey(DOWN_ARROW)
-            PressKey(C)
-            time.sleep(0.1)
-            ReleaseKey(C)
-            break
-        else:
-            Look_up()
-            time.sleep(0.2)
+    profile = get_active_profile()
+    Nothing()
+    if profile.restart_mode == "icey_first_boss_route":
+        time.sleep(ICEY_RETRY_DIALOG_SETTLE_SEC)
+        PressKey(ENTER)
+        time.sleep(ICEY_ENTER_HOLD_SEC)
+        ReleaseKey(ENTER)
+        time.sleep(ICEY_POST_ENTER_WAIT_SEC)
+        PressKey(D)
+        time.sleep(ICEY_SCENE_TRAVEL_RIGHT_SEC)
+        ReleaseKey(D)
+        time.sleep(ICEY_SCENE_SETTLE_SEC)
+        PressKey(D)
+        time.sleep(ICEY_SCENE_TRAVEL_RIGHT_SEC)
+        ReleaseKey(D)
+        time.sleep(ICEY_POST_ROUTE_WAIT_SEC)
+    else:
+        # ICEY restart behavior: neutralize input and give a short settle delay before next episode.
+        time.sleep(0.5)
+
+
+def try_execute_from_text():
+    found, _ = capture_and_detect_keywords({"L"})
+    if "L" in found:
+        Execute()
+        return True
+    return False
+
+
+def recover_and_enter_boss_if_needed():
+    start = time.time()
+    while time.time() - start < RECOVERY_MAX_WAIT_SEC:
+        # “重新开始/死了” are UI prompts meaning retry/death screen; “暴食” is boss-title cue.
+        found, _ = capture_and_detect_keywords({"重新开始", "死了", "暴食"})
+        if "暴食" in found:
+            return True
+        if "重新开始" in found or "死了" in found:
+            PressKey(ENTER)
+            time.sleep(ICEY_ENTER_HOLD_SEC)
+            ReleaseKey(ENTER)
+            time.sleep(ICEY_POST_ENTER_WAIT_SEC)
+            PressKey(D)
+            time.sleep(ICEY_SCENE_TRAVEL_RIGHT_SEC)
+            ReleaseKey(D)
+            boss_wait = time.time()
+            while time.time() - boss_wait < BOSS_WAIT_MAX_SEC:
+                found_boss, _ = capture_and_detect_keywords({"暴食"})
+                if "暴食" in found_boss:
+                    return True
+                time.sleep(TEXT_POLL_INTERVAL_SEC)
+        time.sleep(TEXT_POLL_INTERVAL_SEC)
+    return False
+
+
+ACTION_FUNC_MAP = {
+    "Jump": Jump,
+    "Dash": Dash,
+    "Light_Attack": Light_Attack,
+    "Heavy_Attack": Heavy_Attack,
+    "Execute": Execute,
+}
+
+
+def _resolve_actions():
+    profile = get_active_profile()
+    resolved = []
+    for action_name in profile.action_names:
+        action_func = ACTION_FUNC_MAP.get(action_name)
+        if action_func is None:
+            raise ValueError(f"Unsupported action configured in profile: {action_name}")
+        resolved.append(action_func)
+    return resolved
 
 
 # List for action functions
-Actions = [Attack, Attack_Up,
-           Short_Jump, Mid_Jump, Skill_Up, 
-           Skill_Down, Rush, Cure]
-Directions = [Move_Left, Move_Right, Turn_Left, Turn_Right]
+Actions = _resolve_actions()
+Directions = [Move_Left, Move_Right]
 # Run the action
 def take_action(action):
     Actions[action]()

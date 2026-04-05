@@ -1,15 +1,18 @@
 import cv2
 import numpy as np
 import win32gui, win32ui, win32con, win32api
+from Tool.GameProfile import get_active_profile
 
 
 
 # get hollow knight hwnd
-hwnd = win32gui.FindWindow(None,'Hollow Knight')
+def _get_hwnd():
+    profile = get_active_profile()
+    return win32gui.FindWindow(None, profile.window_title)
 
 # get windows image of hollow knight
 def grab_screen(region=None):
-  
+    hwnd = _get_hwnd()
 
     if region:
             left,top,x2,y2 = region
