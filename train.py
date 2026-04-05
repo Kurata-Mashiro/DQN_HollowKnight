@@ -47,13 +47,14 @@ move_name = list(PROFILE.move_names)
 DELAY_REWARD = 1
 # Safety limit to force episode rollover if no terminal signal is observed from state.
 MAX_EPISODE_STEP = PROFILE.max_episode_step
+TELEMETRY_PRINT_EVERY = 20
 
 
 
 
 def run_episode(hp, algorithm,agent,act_rmp_correct, move_rmp_correct,PASS_COUNT,paused):
-    entered_boss = recover_and_enter_boss_if_needed()
-    if not entered_boss:
+    boss_ready = recover_and_enter_boss_if_needed()
+    if not boss_ready:
         restart()
     # learn while load game
     for i in range(8):
@@ -116,11 +117,12 @@ def run_episode(hp, algorithm,agent,act_rmp_correct, move_rmp_correct,PASS_COUNT
         self_hp = state["self_hp"]
         player_x, player_y = state["player_x"], state["player_y"]
         enemy_x, enemy_y = state["enemy_x"], state["enemy_y"]
-        soul = state["souls"]
-        print(f"[Recognized] self_hp={self_hp}, boss_hp={boss_hp_value}, player=({player_x:.2f},{player_y:.2f}), enemy=({enemy_x:.2f},{enemy_y:.2f}), souls={soul}")
+        souls = state["souls"]
+        if step % TELEMETRY_PRINT_EVERY == 0:
+            print(f"[Recognized] self_hp={self_hp}, boss_hp={boss_hp_value}, player=({player_x:.2f},{player_y:.2f}), enemy=({enemy_x:.2f},{enemy_y:.2f}), souls={souls}")
 
         # ICEY runtime currently does not provide an enemy-skill detector.
-        move, action = agent.sample(stations, soul, enemy_x, enemy_y, player_x, False)
+        move, action = agent.sample(stations, souls, enemy_x, enemy_y, player_x, False)
 
         
         # action = 0

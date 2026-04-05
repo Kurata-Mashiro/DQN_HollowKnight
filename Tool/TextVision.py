@@ -23,9 +23,8 @@ def _extract_text(frame_bgr):
     gray = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2GRAY)
     gray = cv2.resize(gray, None, fx=1.5, fy=1.5, interpolation=cv2.INTER_CUBIC)
     _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    txt_cn = pytesseract.image_to_string(binary, lang="chi_sim+eng", config="--psm 6")
-    txt_en = pytesseract.image_to_string(binary, lang="eng", config="--psm 6")
-    return (txt_cn or "") + "\n" + (txt_en or "")
+    txt = pytesseract.image_to_string(binary, lang="chi_sim+eng", config="--psm 6")
+    return txt or ""
 
 
 def detect_keywords_from_frame(frame, keywords):

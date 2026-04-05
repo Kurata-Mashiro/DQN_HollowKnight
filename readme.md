@@ -12,6 +12,9 @@
 
 1. Open ICEY and enter a repeatable combat scene.
 2. Keep window title as `ICEY` (or set env `RL_GAME_WINDOW_TITLE`).
+   - Example:
+     - PowerShell: `$env:RL_GAME_WINDOW_TITLE="ICEY"`
+     - CMD: `set RL_GAME_WINDOW_TITLE=ICEY`
 3. Run:
    - `python train.py`
 

@@ -110,6 +110,7 @@ def try_execute_from_text():
 def recover_and_enter_boss_if_needed():
     start = time.time()
     while time.time() - start < RECOVERY_MAX_WAIT_SEC:
+        # “重新开始/死了” are UI prompts meaning retry/death screen; “暴食” is boss-title cue.
         found, _ = capture_and_detect_keywords({"重新开始", "死了", "暴食"})
         if "暴食" in found:
             return True
