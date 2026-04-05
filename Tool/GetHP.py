@@ -17,14 +17,51 @@ class Hp_getter():
         self._boss_hp_start_x = 100
         self._boss_hp_end_x = 666
         self._boss_hp_max = 570
+        self._player_blue_min = 60
+        self._player_blue_delta = 20
+        self._boss_red_min = 45
+        self._boss_red_delta = 12
 
-    def _grab_gray(self):
+    def _grab_frame(self):
         frame = grab_screen(self.profile.station_size)
         if frame is None or frame.size == 0:
             return None
-        return cv2.cvtColor(frame, cv2.COLOR_BGRA2GRAY)
+        if len(frame.shape) == 3 and frame.shape[2] == 4:
+            return cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
+        return frame
 
-    def _detect_player_hp(self, gray):
+    def _grab_gray(self, frame=None):
+        if frame is None:
+            frame = self._grab_frame()
+        if frame is None or frame.size == 0:
+            return None
+        if len(frame.shape) == 2:
+            return frame
+        return cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    def _is_blue_pixel(self, pixel):
+        b, g, r = int(pixel[0]), int(pixel[1]), int(pixel[2])
+        return b >= self._player_blue_min and b > g + self._player_blue_delta and b > r + self._player_blue_delta
+
+    def _is_red_pixel(self, pixel):
+        b, g, r = int(pixel[0]), int(pixel[1]), int(pixel[2])
+        return r >= self._boss_red_min and r > g + self._boss_red_delta and r > b + self._boss_red_delta
+
+    def _detect_player_hp_color(self, frame):
+        hp = 0
+        h, w = frame.shape[:2]
+        for idx, (x_, y_) in enumerate(self._player_hp_points):
+            if y_ - 1 < 0 or y_ + 1 >= h or x_ - 1 < 0 or x_ + 1 >= w:
+                continue
+            blue_votes = 0
+            for nx, ny in ((x_, y_), (x_ + 1, y_), (x_ - 1, y_), (x_, y_ + 1), (x_, y_ - 1)):
+                if self._is_blue_pixel(frame[ny][nx]):
+                    blue_votes += 1
+            if blue_votes >= 3:
+                hp = idx + 1
+        return hp if hp > 0 else None
+
+    def _detect_player_hp_gray(self, gray):
         hp = 0
         if gray[40][95] != 56 and gray[300][30] > 20 and gray[200][30] > 20 and gray[400][30] > 20:
             return 9
@@ -42,7 +79,29 @@ class Hp_getter():
                     hp = idx + 1
         return hp if hp > 0 else 1
 
-    def _detect_enemy_hp(self, gray):
+    def _detect_enemy_hp_color(self, frame):
+        h, w = frame.shape[:2]
+        if self._boss_hp_y < 0 or self._boss_hp_y >= h:
+            return None
+        start_x = max(0, self._boss_hp_start_x)
+        end_x = min(w, self._boss_hp_end_x)
+        boss_blood = 0
+        in_bar = False
+        for i in range(start_x, end_x):
+            if self._is_red_pixel(frame[self._boss_hp_y][i]):
+                in_bar = True
+                boss_blood += 1
+            elif in_bar:
+                break
+        if boss_blood <= 0:
+            return None
+        if boss_blood - self._last_enemy_hp < -500:
+            return self._last_enemy_hp
+        if abs(boss_blood - self._last_enemy_hp) < 3:
+            return self._last_enemy_hp
+        return boss_blood
+
+    def _detect_enemy_hp_gray(self, gray):
         if ((gray[self._boss_hp_y][98] != 0 and gray[self._boss_hp_y][98] != 62) or
             (gray[self._boss_hp_y][100] == 0 and gray[self._boss_hp_y][400] == 0 and gray[self._boss_hp_y][450] == 0)):
             return self._boss_hp_max
@@ -93,32 +152,46 @@ class Hp_getter():
     def get_souls(self):
         return self._fallback_state["souls"]
 
-    def get_self_hp(self, gray=None):
-        if gray is None:
-            gray = self._grab_gray()
+    def get_self_hp(self, gray=None, frame=None):
+        if frame is None and gray is None:
+            frame = self._grab_frame()
+            gray = self._grab_gray(frame)
+        elif frame is not None and gray is None:
+            gray = self._grab_gray(frame)
         if gray is None:
             return self._fallback_state["self_hp"]
         try:
-            return self._detect_player_hp(gray)
+            if frame is not None:
+                hp = self._detect_player_hp_color(frame)
+                if hp is not None:
+                    return hp
+            return self._detect_player_hp_gray(gray)
         except Exception:
             return self._fallback_state["self_hp"]
 
 
-    def get_boss_hp(self, gray=None):
-        if gray is None:
-            gray = self._grab_gray()
+    def get_boss_hp(self, gray=None, frame=None):
+        if frame is None and gray is None:
+            frame = self._grab_frame()
+            gray = self._grab_gray(frame)
+        elif frame is not None and gray is None:
+            gray = self._grab_gray(frame)
         if gray is None:
             return self._fallback_state["enemy_hp"]
         try:
-            hp = self._detect_enemy_hp(gray)
+            hp = None
+            if frame is not None:
+                hp = self._detect_enemy_hp_color(frame)
+            if hp is None:
+                hp = self._detect_enemy_hp_gray(gray)
             self._last_enemy_hp = hp
             return hp
         except Exception:
             return self._fallback_state["enemy_hp"]
 
-    def get_play_location(self, gray=None):
+    def get_play_location(self, gray=None, frame=None):
         if gray is None:
-            gray = self._grab_gray()
+            gray = self._grab_gray(frame)
         if gray is None:
             return self._fallback_state["self_x"], self._fallback_state["self_y"]
         try:
@@ -127,9 +200,9 @@ class Hp_getter():
         except Exception:
             return self._fallback_state["self_x"], self._fallback_state["self_y"]
 
-    def get_hornet_location(self, gray=None):
+    def get_hornet_location(self, gray=None, frame=None):
         if gray is None:
-            gray = self._grab_gray()
+            gray = self._grab_gray(frame)
         if gray is None:
             return self._fallback_state["enemy_x"], self._fallback_state["enemy_y"]
         try:
@@ -142,11 +215,12 @@ class Hp_getter():
         return self.get_hornet_location()
 
     def get_state(self):
-        gray = self._grab_gray()
-        self_hp = self.get_self_hp(gray)
-        enemy_hp = self.get_boss_hp(gray)
-        player_x, player_y = self.get_play_location(gray)
-        enemy_x, enemy_y = self.get_hornet_location(gray)
+        frame = self._grab_frame()
+        gray = self._grab_gray(frame)
+        self_hp = self.get_self_hp(gray=gray, frame=frame)
+        enemy_hp = self.get_boss_hp(gray=gray, frame=frame)
+        player_x, player_y = self.get_play_location(gray=gray, frame=frame)
+        enemy_x, enemy_y = self.get_hornet_location(gray=gray, frame=frame)
         souls = self.get_souls()
         return {
             "self_hp": self_hp,
