@@ -57,7 +57,9 @@ class Hp_getter():
         return r >= self._boss_red_min and r > g + self._boss_red_delta and r > b + self._boss_red_delta
 
     def _stabilize_enemy_hp(self, boss_blood):
-        if boss_blood - self._last_enemy_hp < self._boss_hp_sudden_drop_limit:
+        if self._last_enemy_hp <= 0:
+            return boss_blood
+        if boss_blood > self._last_enemy_hp and (boss_blood - self._last_enemy_hp) > abs(self._boss_hp_sudden_drop_limit):
             return self._last_enemy_hp
         if abs(boss_blood - self._last_enemy_hp) < self._boss_hp_stability_tolerance:
             return self._last_enemy_hp
@@ -79,10 +81,14 @@ class Hp_getter():
 
     def _detect_player_hp_gray(self, gray):
         hp = 0
-        if (gray[self._legacy_player_hp_guard_points[0][0]][self._legacy_player_hp_guard_points[0][1]] != self._legacy_player_hp_guard_value and
-            gray[self._legacy_player_hp_guard_points[1][0]][self._legacy_player_hp_guard_points[1][1]] > self._legacy_player_hp_guard_min and
-            gray[self._legacy_player_hp_guard_points[2][0]][self._legacy_player_hp_guard_points[2][1]] > self._legacy_player_hp_guard_min and
-            gray[self._legacy_player_hp_guard_points[3][0]][self._legacy_player_hp_guard_points[3][1]] > self._legacy_player_hp_guard_min):
+        p0_y, p0_x = self._legacy_player_hp_guard_points[0]
+        p1_y, p1_x = self._legacy_player_hp_guard_points[1]
+        p2_y, p2_x = self._legacy_player_hp_guard_points[2]
+        p3_y, p3_x = self._legacy_player_hp_guard_points[3]
+        if (gray[p0_y][p0_x] != self._legacy_player_hp_guard_value and
+            gray[p1_y][p1_x] > self._legacy_player_hp_guard_min and
+            gray[p2_y][p2_x] > self._legacy_player_hp_guard_min and
+            gray[p3_y][p3_x] > self._legacy_player_hp_guard_min):
             return 9
         for idx, (x_, y_) in enumerate(self._player_hp_points):
             pixel = int(gray[y_][x_]) + int(gray[y_ + 1][x_]) + int(gray[y_ - 1][x_]) + int(gray[y_][x_ + 1]) + int(gray[y_][x_ - 1])
