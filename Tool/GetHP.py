@@ -7,6 +7,7 @@ class Hp_getter():
     def __init__(self):
         profile = get_active_profile()
         self.profile = profile
+        # Used by training loop to indicate state comes from screen telemetry.
         self.has_realtime_telemetry = True
         self._fallback_state = dict(profile.state_fallback)
         self._last_enemy_hp = int(self._fallback_state["enemy_hp"])
@@ -21,6 +22,14 @@ class Hp_getter():
         self._player_blue_delta = 20
         self._boss_red_min = 45
         self._boss_red_delta = 12
+        self._boss_hp_sudden_drop_limit = -500
+        self._boss_hp_stability_tolerance = 3
+        self._actor_min_area = 80
+
+        # Legacy grayscale fallback sentinels around top-left UI.
+        self._legacy_player_hp_guard_value = 56
+        self._legacy_player_hp_guard_min = 20
+        self._legacy_player_hp_guard_points = ((40, 95), (300, 30), (200, 30), (400, 30))
 
     def _grab_frame(self):
         frame = grab_screen(self.profile.station_size)
@@ -47,6 +56,13 @@ class Hp_getter():
         b, g, r = int(pixel[0]), int(pixel[1]), int(pixel[2])
         return r >= self._boss_red_min and r > g + self._boss_red_delta and r > b + self._boss_red_delta
 
+    def _stabilize_enemy_hp(self, boss_blood):
+        if boss_blood - self._last_enemy_hp < self._boss_hp_sudden_drop_limit:
+            return self._last_enemy_hp
+        if abs(boss_blood - self._last_enemy_hp) < self._boss_hp_stability_tolerance:
+            return self._last_enemy_hp
+        return boss_blood
+
     def _detect_player_hp_color(self, frame):
         hp = 0
         h, w = frame.shape[:2]
@@ -63,7 +79,10 @@ class Hp_getter():
 
     def _detect_player_hp_gray(self, gray):
         hp = 0
-        if gray[40][95] != 56 and gray[300][30] > 20 and gray[200][30] > 20 and gray[400][30] > 20:
+        if (gray[self._legacy_player_hp_guard_points[0][0]][self._legacy_player_hp_guard_points[0][1]] != self._legacy_player_hp_guard_value and
+            gray[self._legacy_player_hp_guard_points[1][0]][self._legacy_player_hp_guard_points[1][1]] > self._legacy_player_hp_guard_min and
+            gray[self._legacy_player_hp_guard_points[2][0]][self._legacy_player_hp_guard_points[2][1]] > self._legacy_player_hp_guard_min and
+            gray[self._legacy_player_hp_guard_points[3][0]][self._legacy_player_hp_guard_points[3][1]] > self._legacy_player_hp_guard_min):
             return 9
         for idx, (x_, y_) in enumerate(self._player_hp_points):
             pixel = int(gray[y_][x_]) + int(gray[y_ + 1][x_]) + int(gray[y_ - 1][x_]) + int(gray[y_][x_ + 1]) + int(gray[y_][x_ - 1])
@@ -95,11 +114,7 @@ class Hp_getter():
                 break
         if boss_blood <= 0:
             return None
-        if boss_blood - self._last_enemy_hp < -500:
-            return self._last_enemy_hp
-        if abs(boss_blood - self._last_enemy_hp) < 3:
-            return self._last_enemy_hp
-        return boss_blood
+        return self._stabilize_enemy_hp(boss_blood)
 
     def _detect_enemy_hp_gray(self, gray):
         if ((gray[self._boss_hp_y][98] != 0 and gray[self._boss_hp_y][98] != 62) or
@@ -112,11 +127,7 @@ class Hp_getter():
                 boss_blood += 1
             else:
                 break
-        if boss_blood - self._last_enemy_hp < -500:
-            return self._last_enemy_hp
-        if abs(boss_blood - self._last_enemy_hp) < 3:
-            return self._last_enemy_hp
-        return boss_blood
+        return self._stabilize_enemy_hp(boss_blood)
 
     def _estimate_actor_positions(self, gray):
         # Simple vision estimator by bright-object centroids in lower half.
@@ -130,7 +141,7 @@ class Hp_getter():
         candidates = []
         for i in range(1, nlabels):
             area = stats[i, cv2.CC_STAT_AREA]
-            if area < 80:
+            if area < self._actor_min_area:
                 continue
             cx, cy = centroids[i]
             candidates.append((area, float(cx), float(cy)))
